@@ -1,0 +1,138 @@
+---
+title: "Parkinson’s Disease Analysis"
+author: "Claire Green"
+date: "28/02/2018"
+output: html_document
+---
+
+#Data Sets
+
+Datasets were searched for using the same filters as before - must be human tissue that expressed lewy bodies, must have at least 3 patients and 3 controls, and must...
+
+10 datasets were identified:
+
+| CodeID | Tissue/Cell type                                         | Variant       | Samples                                                                                                                                                 | Type of array                               | GEO Ref  | Comments                                                               | PIs                                                                                               |
+|--------|----------------------------------------------------------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|----------|------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| DIJ    | Substantia Nigra                                         | not specified | 15 disease, 8 control                                                                                                                                   | Affymetrix Human Genome U133 Plus 2.0 Array | GSE49036 | Has some Braak staging                                                 | Dijkstra AA, Ingrassia AI, de Menezes RX, van Kesteren RE, Rozemuller AM, Heutink P, vandeBerg WJ |
+| FFR    | Substantia Nigra                                         | not specified | 9 replicates for the controls and 16 replicates for the Parkinson's disease patients                                                                    | Affymetrix Human Genome U133 Plus 2.0 Array | GSE7621  |                                                                        | Ffrench-Mullen JM                                                                                 |
+| MOR.SN | substantia nigra, split into medial and lateral portions | sporadic      | 15 samples of medial parkinsonian SN, 9 samples of lateral parkinsonian SN (24), 8 medial nigra control samples and 7 lateral nigra control samples(15) | Affymetrix Human Genome U133A Array         | GSE8397  | Age and sex                                                            | Moran LB, Graeber MB                                                                              |
+| MID1   | Substantia Nigra pars compacta                           | not specified | 10 PD brain samples and 8 control                                                                                                                       | Affymetrix Human Genome U133 Plus 2.0 Array | GSE20141 |                                                                        | Middleton FA, Kim PD, Zhang-James Y, Davis RL                                                     |
+| MID2   | whole substantia nigra                                   | not specified | 18 controls, 11 patients                                                                                                                                | Affymetrix Human Genome U133A Array         | GSE20292 | Age and sex                                                            | Middleton FA, James M, Zhang Y, Davis RL                                                          |
+| DUM    | Cortex (BA9)                                             | not specified | 29 PD, 44 neurologically normal controls                                                                                                                | Illumina HiSeq 2000                         | GSE68719 | Have age of death, sex, and some samples have corresponding proteomics | Dumitriu A, Golji J, Labadorf AT, Gao B, Beach TG, Myers RH, Longo KA, Latourelle JC              |
+| MOR.FC | Frontal cortex                                           | sporadic      | 3 Controls 5 Patients                                                                                                                                   | Affymetrix Human Genome U133A Array         | GSE8397  | Age and sex                                                            | Moran LB, Graeber MB                                                                              |
+| LEW    | two regions of the medulla                               | not specified | 6 PD cases and 5 controls (two regions)                                                                                                                 | Affymetrix Human Genome U133A 2.0 Array     | GSE19587 | Age and sex                                                            | lewandowski nm, small sa                                                                          |
+| MID3   | prefrontal cortex                                        | not specified | 15 controls 14 patients                                                                                                                                 | Affymetrix Human Genome U133A Array         | GSE20168 | Age and sex                                                            | Middleton FA, James M, Zhang Y, Davis RL                                                          |
+| MID4   | putamen                                                  | not specified | 20 controls and  15 patients                                                                                                                            | Affymetrix Human Genome U133A Array         | GSE20291 | Age and sex                                                            | Middleton FA, James M, Zhang Y, Davis RL                                                          |
+
+#Quality Control
+
+Checked data distribution using PCA and boxplots. Some of the datasets have quite mixed samples wereas others separate quite nicely into controls and patients. Boxplots didn't suggest any samples were outliers.
+
+#Differential Gene Expression
+
+As with the TDP-43 data, microarray data was analysed using Limma. The genes were divided into positive and negative fold change. Intersected gene lists can be found in /Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/FoldChange. 
+
+## Commonly Upregulated Genes
+
+| ~~~~~~~~~~~ | ~~~~~~~~~~~ | ~~~~~~~~~~~  | ~~~~~~~~~~~ | ~~~~~~~~~~~ | ~~~~~~~~~~~  | ~~~~~~~~~~~ | ~~~~~~~~~~~ | ~~~~~~~~~~~   | ~~~~~~~~~~~ | ~~~~~~~~~~~ |
+|-------------|-------------|--------------|-------------|-------------|--------------|-------------|-------------|---------------|-------------|-------------|
+| A4GNT       | C3          | CPED1        | FAM46A      | HCK         | KDM4A        | LY6G5C      | NRDE2       | RBMS2         | SMIM14      | TNFRSF10B   |
+| ABCC6       | C3AR1       | CPM          | FAM60A      | HDC         | KDM4C        | LYVE1       | NYX         | RCC1          | SNAP23      | TNFRSF10D   |
+| AC012065.7  | C8orf60     | CPSF3L       | FANCE       | HERC2P3     | KIAA0101     | LYZL6       | OR1F1       | RDH16         | SND1-IT1    | TNFRSF25    |
+| ACP5        | C9orf3      | CROCC        | FAS         | HIST1H1T    | KIAA0226L    | MAF         | ORM1        | RHBDF2        | SOGA1       | TNFSF14     |
+| ACSBG2      | CALML4      | CROCCP3      | FASLG       | HIST1H2AB   | KIAA0485     | MAFF        | OSM         | RIBC2         | SORBS1      | TNN         |
+| ACSS3       | CASP1       | CSPG4        | FCGBP       | HIST1H2AD   | KIAA1614     | MAP2K7      | P4HA1       | RIPK2         | SOS2        | TP73-AS1    |
+| ADH1B       | CASP2       | CTBP2        | FCGR2A      | HMOX1       | KIAA1661     | MAPKBP1     | PAGE1       | RNASE6        | SOX12       | TRAF1       |
+| ADIPOQ      | CASP4       | CTD-2269F5.1 | FCGR2B      | HNRNPM      | KIF13A       | MAVS        | PAPOLA      | RP11-217B7.2  | SOX2        | TRAPPC10    |
+| ADORA3      | CASP6       | CXCR4        | FCRL2       | HOXB8       | KLHL36       | MBD5        | PARP16      | RP11-255C15.3 | SOX9        | TRIM21      |
+| AF007147    | CASP7       | CXorf21      | FGF17       | HP1BP3      | KLK2         | MBTD1       | PAWR        | RP11-403P17.4 | SP140L      | TRIM5       |
+| AGAP10      | CASP8       | CXorf36      | FGF3        | HS3ST1      | KRI1         | MCM3AP-AS1  | PCDH12      | RP11-548H18.2 | SPG21       | TTLL5       |
+| AGRP        | CATSPER2    | CYP21A1P     | FGFR1       | HSPA1A      | KRT19P2      | MECOM       | PCDHGA8     | RPA4          | SPINK1      | TUBD1       |
+| ALOX5       | CCDC101     | CYP39A1      | FKBP10      | HSPA1L      | L2HGDH       | MED13L      | PDLIM1      | RPL23AP32     | SPTLC3      | TULP2       |
+| ALOX5AP     | CCDC15      | CYTH4        | FLCN        | HSPA6       | LAG3         | METTL4      | PELI2       | RPL23AP53     | SRP19       | TYMP        |
+| ALPK1       | CCDC40      | DAPP1        | FLJ21369    | HSPD1       | LAMB2        | METTL7A     | PGF         | RREB1         | SRSF5       | TYROBP      |
+| AMELX       | CCL17       | DBF4B        | FLT1        | IFNA2       | LAT2         | MFAP5       | PGPEP1      | RRNAD1        | SSTR3       | UGGT1       |
+| AMELY       | CCL22       | DCLRE1C      | FLT3LG      | IFNA21      | LECT1        | MICB        | PIDD1       | RUNX1-IT1     | ST20        | UPK3B       |
+| AMH         | CCL27       | DDR1-AS1     | FMO5        | IGF1R       | LEF1         | MID1        | PIGO        | RUNX3         | ST6GAL1     | USP34       |
+| ANGPT2      | CD14        | DENND2D      | FNDC3B      | IGFBP5      | LENEP        | MILR1       | PILRA       | S100A11P1     | STAG3L3     | VPS54       |
+| ANP32A-IT1  | CD163       | DFFB         | FOXD1       | IGKV1-17    | LEPREL1      | MIR612      | PIM1        | S100A4        | STIP1       | VSIG4       |
+| AP1G2       | CD207       | DIP2A        | FOXL2       | IGLL3P      | LEPREL4      | MKRN4P      | PLAC8       | SAFB2         | STK10       | WBSCR16     |
+| APOBEC3C    | CD22        | DISC1        | FPR1        | IGSF9B      | LGALS9       | MS4A6A      | PLEKHF2     | SAT1          | STOM        | WDR4        |
+| APOC2       | CD247       | DKFZP434A062 | FYB         | IL12RB1     | LILRA2       | MSH5        | PLGLB1      | SCAF4         | TAF4        | WDR52       |
+| AQP8        | CD300A      | DMC1         | FZD5        | IL16        | LINC00115    | MSX1        | PLIN2       | SCD5          | TAL1        | WDR55       |
+| ARHGAP25    | CD37        | DNA2         | FZD7        | IL17RB      | LINC00260    | MT1M        | PLK3        | SCIN          | TAS2R10     | WDR78       |
+| ARHGDIB     | CD48        | DNAJB1       | FZD9        | IL18        | LINC00894    | MYH7B       | PLOD2       | SCNN1B        | TAS2R13     | XRCC2       |
+| ARHGEF4     | CD68        | DNAJB6       | G0S2        | IL1R1       | LINC00963    | MYO1C       | PLTP        | SDCCAG3       | TAZ         | ZBED2       |
+| ARID3A      | CD84        | DNASE2       | G3BP1       | IL21        | LLGL2        | MZT2B       | PODNL1      | SERPINA1      | TBX6        | ZC3HAV1     |
+| ATAD2B      | CDA         | DOCK10       | GABPA       | INE1        | LOC100272216 | NABP1       | POGLUT1     | SERPINH1      | TBXAS1      | ZFP36L1     |
+| ATHL1       | CDC14A      | DOCK2        | GAL3ST4     | INPP5B      | LOC100506699 | NACAP1      | POGZ        | SERTAD3       | TCF3        | ZMYND8      |
+| ATP8B1      | CDK2AP2     | DSE          | GAS1        | INPP5D      | LOC101928198 | NBEAL2      | PPP1R14D    | SH2B2         | TFAP2B      | ZNF14       |
+| ATXN7       | CEBPD       | DTYMK        | GATA1       | INVS        | LOC101928274 | NBR2        | PPP2R1B     | SHMT1         | TFEC        | ZNF217      |
+| AVIL        | CEL         | EEF1DP5      | GCKR        | IRF4        | LOC101929240 | NCKAP1L     | PRR11       | SIGLEC7       | TFPI        | ZNF224      |
+| AZGP1       | CHD2        | EFNA4        | GDF15       | IRF6        | LOC101929889 | NEUROG1     | PRRG4       | SIGLEC8       | TGFBR3      | ZNF235      |
+| AZGP1P1     | CHKB-CPT1B  | EGF          | GDF9        | IRF7        | LOC102724229 | NFATC3      | PSCA        | SIM2          | TGIF1       | ZNF34       |
+| AZU1        | CHRNG       | ELF4         | GEM         | ITFG2       | LOC102725016 | NFE2        | PSG11       | SIX6          | TIMM44      | ZNF354A     |
+| BANP        | CHST4       | EMC10        | GJA9-MYCBP  | ITGB6       | LOC284009    | NHLH1       | PTPN14      | SLA           | TLR5        | ZNF430      |
+| BC069804    | CLEC2B      | ENTPD1       | GJD2        | ITPR3       | LOC729164    | NOTCH2NL    | PTPRCAP     | SLAMF8        | TM4SF1      | ZNF446      |
+| BMP8B       | CLIC2       | ENTPD7       | GK2         | JMJD6       | LOC79999     | NOX3        | RAB13       | SLC11A1       | TMEM176A    | ZNF516      |
+| BRPF1       | CLK1        | EP300        | GP9         | KCNE4       | LPAR2        | NPIPA1      | RAC2        | SLC27A3       | TMEM19      | ZNF665      |
+| BTBD18      | COL16A1     | EPOR         | GPR25       | KCNJ8       | LPAR4        | NPIPB15     | RAD52       | SLC2A5        | TMEM51      | ZNF670      |
+| C10orf12    | COL5A1      | ETV1         | GRAMD3      | KCNK5       | LPP          | NPL         | RAD54L      | SLC35C2       | TMPRSS11E   | ZNF710      |
+| C11orf16    | COL7A1      | FAM106A      | GTSE1       | KCNQ1       | LRRC1        | NPR3        | RBL1        | SLC7A9        | TMPRSS5     | ZNF721      |
+| C1QB        | COL9A1      | FAM118A      | GUSBP3      | KCTD5       | LRRFIP1      | NR6A1       | RBM38       | SMAD6         | TNFAIP8     | ZNF74       |
+|             |             |              |             |             |              |             |             |               |             | ZNF783      |
+
+
+## Commonly Downregulated Genes
+| ~~~~~~~~~~~ | ~~~~~~~~~~~ | ~~~~~~~~~~~ | ~~~~~~~~~~~ | ~~~~~~~~~~~  | ~~~~~~~~~~~ | ~~~~~~~~~~~ | ~~~~~~~~~~~ | ~~~~~~~~~~~ | ~~~~~~~~~~~ | ~~~~~~~~~~~ |
+|-------------|-------------|-------------|-------------|--------------|-------------|-------------|-------------|-------------|-------------|-------------|
+| ABCA11P     | ATP5D       | CLINT1      | EIF2B3      | GPN1         | LOC728392   | MZT2A       | PFDN2       | PSMD8       | SLC9A1      | TSSC1       |
+| ABCF1       | ATP5F1      | CLIP3       | EIF2S1      | GPX4         | LRBA        | NAPA        | PFKM        | PSME3       | SLITRK5     | TTC19       |
+| ABHD11      | ATP5G1      | CLTB        | EIF3F       | GRAMD1B      | LRPPRC      | NDEL1       | PFN2        | PSMG1       | SNCA        | TTC9        |
+| ACAT1       | ATP6AP1     | CMAS        | EIF3I       | GSS          | LYRM4       | NDFIP1      | PGAM1       | PTBP2       | SNRPN       | TUBA1B      |
+| ACAT2       | ATP6V0B     | COA3        | EIF3K       | GSTA4        | LYRM9       | NDUFA10     | PGRMC1      | PTDSS1      | SNX24       | TUBA1C      |
+| ACP2        | ATP6V0C     | COA7        | EIF6        | GSTO1        | MAGED1      | NDUFA13     | PHB2        | PTP4A1      | SORD        | TUBB        |
+| ACTB        | ATP6V1E1    | COMMD9      | ELOVL6      | HARS         | MAGED2      | NDUFA3      | PINK1       | PTPRA       | SPAG16      | TUBB2A      |
+| ACTR1A      | ATP6V1F     | COPS3       | ELP3        | HERC6        | MAK16       | NDUFA7      | PITPNA      | RAB14       | SPAG7       | TUBB3       |
+| ADAM23      | ATP6V1G2    | COPS4       | EMC7        | HINT1        | MAP1B       | NDUFA9      | PITPNB      | RABEPK      | SPCS1       | TUBG1       |
+| AFG3L2      | ATP6V1H     | COPS5       | ENDOD1      | HLTF         | MAP1LC3B    | NDUFAB1     | PITRM1      | RAN         | SPCS3       | TUFM        |
+| AGTPBP1     | AURKAIP1    | COPS7A      | ENOPH1      | HMCES        | MAPK10      | NDUFAF1     | PKI55       | RANGRF      | SPRYD7      | TUSC2       |
+| AHCY        | AVPI1       | COQ3        | ENSA        | HMGN4        | MDH1        | NDUFB5      | PLD3        | RARS        | SRPRB       | TXNDC15     |
+| AIFM1       | B3GNT2      | COX7A2L     | ENTPD6      | HNRNPA0      | MDH2        | NDUFS1      | PLEKHB2     | RBFOX2      | SRRD        | UBB         |
+| AIMP2       | BABAM1      | COX8A       | ERCC1       | HPCAL4       | ME2         | NDUFS3      | PMPCA       | RBM3        | SSSCA1      | UBE2E3      |
+| AJAP1       | BECN1       | CREB3       | ERP29       | HSPA12A      | ME3         | NDUFS5      | PMS2        | RITA1       | ST3GAL5     | UBE3B       |
+| AK055981    | BEND5       | CRMP1       | EXOSC9      | IARS         | MECR        | NDUFV1      | PMS2P1      | RNASEH1     | STAT4       | UCHL1       |
+| AK5         | BEX4        | CRY2        | FABP3       | IARS2        | MFN2        | NDUFV2      | PMS2P5      | RNF10       | STRAP       | UQCRC1      |
+| AKAP12      | BFSP1       | CSNK2A1     | FAF1        | IDH3B        | MGST3       | NEDD8       | POLR2C      | RPA2        | STS         | UQCRFS1     |
+| AKAP6       | BPGM        | CSRNP2      | FAM127A     | IDH3G        | MICU1       | NEU1        | POLR3C      | RPH3A       | STX12       | UQCRQ       |
+| AKTIP       | BRE         | CTNNA2      | FAM134C     | IDI1         | MIEF1       | NGFRAP1     | POP4        | RPP14       | STXBP1      | UROD        |
+| ALAS1       | BRF2        | CUL2        | FAM162A     | IMP4         | MIF         | NHP2        | PPFIA2      | RPS6KC1     | SUMO3       | UROS        |
+| ALDH1A1     | BSN         | CX3CL1      | FAM168A     | INSIG1       | MIR21       | NIF3L1      | PPIA        | RRAGA       | SYN1        | USP7        |
+| ANXA2       | BTBD3       | CXorf40A    | FAM206A     | IQSEC1       | MIR3656     | NIPSNAP1    | PPME1       | RTCB        | SYT11       | UTP18       |
+| ANXA6       | C11orf49    | CXorf40A    | FBXW2       | IRGQ         | MIR4784     | NIT2        | PPP1R7      | RTF1        | TACO1       | VAMP7       |
+| AP1S1       | C12orf10    | CXorf40B    | FDPS        | ITFG1        | MIR636      | NME1        | PPP2CA      | RTN4        | TCEA2       | VLDLR       |
+| AP2M1       | C1orf216    | CYC1        | FECH        | ITPA         | MIR6890     | NOP16       | PPP2R1A     | RWDD2B      | TCEAL2      | VPS41       |
+| AP2S1       | C21orf33    | CYP2E1      | FHIT        | ITPR1        | MLH1        | NRXN3       | PPP2R2B     | SAMM50      | TCEAL4      | VPS4B       |
+| AP3M2       | C3orf62     | DCTN3       | FIBP        | KATNB1       | MMP24-AS1   | NSDHL       | PPP2R5D     | SARS        | TFCP2       | VPS51       |
+| AP3S2       | C5orf30     | DCTN6       | FIG4        | KHDRBS1      | MOCS2       | NUDCD3      | PPP3CB      | SCAMP5      | TFPT        | WBP11       |
+| APEH        | C6orf106    | DCTPP1      | FKBP1B      | KIAA0391     | MOSPD1      | NUDT2       | PRC1        | SCFD1       | TIMM10      | WDR44       |
+| APEX1       | CCBL2       | DDA1        | FLRT1       | KIAA0513     | MPI         | NUP155      | PRKCZ       | SDHA        | TIMM10B     | WDR61       |
+| APLP2       | CCDC51      | DDHD2       | FRMPD4      | KIAA1279     | MRPL15      | ODC1        | PRMT8       | SDHAF1      | TIMM8B      | WDR7        |
+| APMAP       | CCK         | DDX1        | FTO         | KIF2A        | MRPL35      | ODF2        | PRPF4       | SDHAP1      | TMED3       | WDR77       |
+| AREL1       | CCNH        | DDX24       | FUCA1       | KIF3C        | MRPL4       | OPTN        | PRR13       | SEC31A      | TMEM177     | WDYHV1      |
+| ARF1        | CCSER2      | DDX42       | GABARAPL1   | KIFAP3       | MRPS18A     | ORC5        | PSD3        | SEH1L       | TMEM208     | YWHAZ       |
+| ARF3        | CDC123      | DGUOK       | GABBR1      | KLHDC4       | MRPS22      | OSBP        | PSMA1       | SERINC3     | TMEM246     | ZDHHC4      |
+| ARFGAP2     | CDC42       | DHRS11      | GALNT11     | L1CAM        | MRPS33      | OXCT1       | PSMA5       | SEZ6L2      | TMEM41B     | ZDHHC6      |
+| ARHGEF9     | CDK20       | DHRS7B      | GARS        | LANCL1       | MRPS35      | OXLD1       | PSMB3       | SF3A3       | TMEM97      | ZMYM4       |
+| ARL2BP      | CDK5        | DIABLO      | GBAS        | LANCL2       | MRPS7       | PAAF1       | PSMB4       | SF3B5       | TMUB2       | ZNF365      |
+| ARMC2-AS1   | CDK7        | DKK3        | GGNBP2      | LBH          | MRTO4       | PAFAH1B1    | PSMB5       | SH3BP5      | TOMM20      | ZNF593      |
+| ARPC1A      | CDS2        | DLD         | GLO1        | LCMT1        | MTCH1       | PARL        | PSMB6       | SIPA1L1     | TOR1AIP2    | ZNF629      |
+| ARPC5L      | CERK        | DNAJC8      | GLOD4       | LDHA         | MTCH2       | PARN        | PSMB7       | SLC23A2     | TOX4        |             |
+| ASS1        | CFL1        | DRG1        | GLT8D1      | LDHB         | MTCL1       | PCCB        | PSMC1       | SLC25A11    | TP53BP1     |             |
+| ASTN2       | CHCHD2      | DSTN        | GMPR2       | LDLRAD4      | MTHFD1      | PCYOX1L     | PSMC2       | SLC25A3     | TPGS2       |             |
+| ATG14       | CHP1        | DUSP26      | GNB1        | LDOC1        | MTPAP       | PDCL3       | PSMC5       | SLC25A46    | TRAP1       |             |
+| ATP1A1      | CHST1       | DYNC1H1     | GNB5        | LETMD1       | MTX2        | PDHB        | PSMD1       | SLC25A5     | TRAPPC2L    |             |
+| ATP1A3      | CIAPIN1     | DYNC1I1     | GOT1        | LINC00094    | MX1         | PDK2        | PSMD11      | SLC25A6     | TSG101      |             |
+| ATP2B2      | CIRBP       | DZIP3       | GOT2        | LMO3         | MYH10       | PDZD8       | PSMD14      | SLC30A9     | TSPAN3      |             |
+| ATP5A1      | CITED1      | EAPP        | GPD1L       | LOC101927673 | MYL12B      | PEX14       | PSMD2       | SLC35B1     | TSPAN7      |             |
+| ATP5B       | CLCN6       | EIF2AK1     | GPI         | LOC645166    | MYL5        | PEX19       | PSMD7       | SLC6A1      | TSR2        |             |

@@ -1,0 +1,8 @@
+
+_result --> all transcripts with summary statistics
+
+_finalresult --> all transcripts, summary statistics merged with annotation file
+
+_rankeduniqueresult --> same as _finalresult but with one transcript per gene, ranked by p value
+
+_filteredresult --> same as rankeduniqueresult but filtered for mas5call and no gene symbil
