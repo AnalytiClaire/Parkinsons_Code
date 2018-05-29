@@ -20,13 +20,18 @@ Datasets were searched for using the same filters as before - must be human tiss
 | MID2   | whole substantia nigra                                   | not specified | 18 controls, 11 patients                                                                                                                                | Affymetrix Human Genome U133A Array         | GSE20292 | Age and sex                                                            | Middleton FA, James M, Zhang Y, Davis RL                                                          |
 | DUM    | Cortex (BA9)                                             | not specified | 29 PD, 44 neurologically normal controls                                                                                                                | Illumina HiSeq 2000                         | GSE68719 | Have age of death, sex, and some samples have corresponding proteomics | Dumitriu A, Golji J, Labadorf AT, Gao B, Beach TG, Myers RH, Longo KA, Latourelle JC              |
 | MOR.FC | Frontal cortex                                           | sporadic      | 3 Controls 5 Patients                                                                                                                                   | Affymetrix Human Genome U133A Array         | GSE8397  | Age and sex                                                            | Moran LB, Graeber MB                                                                              |
-| LEW    | two regions of the medulla                               | not specified | 6 PD cases and 5 controls (two regions)                                                                                                                 | Affymetrix Human Genome U133A 2.0 Array     | GSE19587 | Age and sex                                                            | lewandowski nm, small sa                                                                          |
+| LEW    | two regions of the medulla                               | not specified | 14 PD samples and 8 controls (two regions)                                                                                                                 | Affymetrix Human Genome U133A 2.0 Array     | GSE19587 | Age and sex                                                            | lewandowski nm, small sa                                                                          |
 | MID3   | prefrontal cortex                                        | not specified | 15 controls 14 patients                                                                                                                                 | Affymetrix Human Genome U133A Array         | GSE20168 | Age and sex                                                            | Middleton FA, James M, Zhang Y, Davis RL                                                          |
 | MID4   | putamen                                                  | not specified | 20 controls and  15 patients                                                                                                                            | Affymetrix Human Genome U133A Array         | GSE20291 | Age and sex                                                            | Middleton FA, James M, Zhang Y, Davis RL                                                          |
 
-#Quality Control
+#Quality Control - PD_QC.R
 
 Checked data distribution using PCA and boxplots. Some of the datasets have quite mixed samples wereas others separate quite nicely into controls and patients. Boxplots didn't suggest any samples were outliers.
+
+
+```{r, out.width = "900px", out.height = "700px", echo=F}
+knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/QC/QC_plots.pdf")
+```
 
 #Differential Gene Expression
 
@@ -136,3 +141,951 @@ As with the TDP-43 data, microarray data was analysed using Limma. The genes wer
 | ATP2B2      | CIRBP       | DZIP3       | GOT2        | LMO3         | MYH10       | PDZD8       | PSMD14      | SLC30A9     | TSPAN3      |             |
 | ATP5A1      | CITED1      | EAPP        | GPD1L       | LOC101927673 | MYL12B      | PEX14       | PSMD2       | SLC35B1     | TSPAN7      |             |
 | ATP5B       | CLCN6       | EIF2AK1     | GPI         | LOC645166    | MYL5        | PEX19       | PSMD7       | SLC6A1      | TSR2        |             |
+
+
+## Mouse data
+
+Mouse data was sourced from GEO https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE4758, referenced as CON, however during the analysis I realised that alpha synuclein had a positive log fold change, even though every other dataset reported a negative log fold change for sporadic parkinson's disease. Looking back at the dataset I realised it was an overexpression model rather than a mutant. Woops!
+
+## Alpha synuclein expression
+
+What's interesting is that canonically, alpha synuclein has been suggested to be overexpressed in sporadic parkinson's patients. 
+
+#Filtering out other signals
+
+As was done with the TDP-43 pipeline, I had to find other signals that could be contaminating the sporadic signal. I decided to use the ALS datasets from the TDP-43 analysis to represent "general neurodegeneration", (C9orf72, sALS, PET, RAV, SOD1, FUS) but actually there was very little overlap:
+
+### Common Up (ALS)
+ALOX5
+ALPK1
+STOM
+MAFF
+COL7A1
+
+### Common Down (ALS)
+PMS2P1
+ATP6V1G2
+INSIG1
+RRAGA
+TPGS2
+MTCH2
+PPP2CA
+GLO1
+PDHB
+
+
+In a similar vein I decided to source some sporadic Parkinson's disease blood - to make sure it was leaving a more tissue specific signal. I found two datasets on GEO - GSE99039 (AMA) and GSE72267 (RON). These were bigger datasets than I usually use - AMA was total 353 samples, RON 59. What I realised was that my filters for the presence calls were still 2. This meant that 24,000 genes/probes passed through filtering which was making huge overlaps. I realised a filter of 2 wasn't really proportional to the number of samples in AMA, so I increased this to 20 (as the dataset is approximately 10 times larger than the other datasets I have been using).
+
+These two datasets produced a common gene expression signature of approximately 5000 genes, which is quite a lot of concordance. When you compare this to the brain signal, there is an overlap of 88 upregulated and 76 downregulated genes. This is quite a small overlap considering the size of the blood signature. 
+
+At this point, the remaining gene list for the sporadic signature is 558 genes (look for *Filt_ALS_blood* files)
+
+## Enrichr
+
+Down http://amp.pharm.mssm.edu/Enrichr/enrich?dataset=3rwmj
+
+Up http://amp.pharm.mssm.edu/Enrichr/enrich?dataset=3rwmr
+
+### CON DATA
+
+There was a dataset I labelled "CON" with the GSEnumber GSE4758 that I included for a little while as it was a mouse model of alpha synuclein which I later removed as the research question changed.
+
+### Adding LRRK2 Data
+
+Oliver Bandmann mentioned that there is a phenomenon that LRRK2 patients exhibit their disease more closely to sporadic patients than other familial patients. I thought this was interesting and could be a good application of my methdology.
+
+I sourced two datasets with LRRK2 patient data - GSE34516 and GSE23290. These were exon array so had to first be preprocessed by Wenbin in the Affymetrix Console using RMA-sketch. The output was normalised expression data. Mas5Calls didn't seem to work so I skipped this step. 
+
+```{r, eval = F}
+#### BOT GSE34516 #########
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Data/")
+Data <- read.csv("GSE34516.RMA-GENE-EXTENDED-EC-hg19-na36_LRRK2only.csv", row.names = 1)
+
+genename <- as.data.frame(Data$GeneSymbol)
+rownames(genename) <- rownames(Data)
+colnames(genename) <- "Gene.Symbol"
+#Data is already normalised using RMA-sketch
+analysis.name<-"BOT" #Label analysis
+expressionMatrix<-Data[,1:6] #takes expression from normalised expression set
+
+
+Treat<-factor(rep(c("Control", "Patient"),c(4,2)), levels=c("Control", "Patient"))
+design<-model.matrix(~Treat)
+rownames(design)<-colnames(expressionMatrix)
+design
+
+#Conduct statistical analysis of expression
+library(limma)
+fit<-lmFit(expressionMatrix, design) #linear model fit
+fit<-eBayes(fit) 
+result<-topTable(fit, coef="TreatPatient", adjust="BH", number=nrow(expressionMatrix)) #"BH" adjust for multiple hypothesis testing
+#toptable normally takes top number but this takes all
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression")
+write.csv(result, file = paste(analysis.name, "_result.csv", sep = ""))
+
+
+result$"Fold Change"<-2^result$logFC 
+result$"Fold Change"[result$"Fold Change"<1]<-(-1)/result$"Fold Change"[result$"Fold Change"<1] #converts log fold change into a linear value above or below 0
+expressionLinear<-as.data.frame(2^expressionMatrix)
+expressionLinear$ProbeSetID<-rownames(expressionLinear)
+result<-merge(result, expressionLinear, by = 0) #merge values into one array
+result<-merge(result, genename, by.x = "Row.names", by.y = 0)
+result<-subset(result, subset=(Gene.Symbol !="---")) #if no gene symbol, discount
+
+
+setwd(dir = "/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/")
+write.csv(result, file=paste(analysis.name, "_finalresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+genesort <- result[order(result$P.Value),]
+uniqueresult <- genesort[!duplicated(genesort[,16]),]
+write.csv(uniqueresult, file=paste(analysis.name, "rankeduniqueresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+#### BOT2 GSE23290 #########
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Data/")
+Data <- read.csv("GSE23290.RMA-GENE-EXTENDED-EC-hg19-na36_LRRK2only.csv", row.names = 1)
+
+genename <- as.data.frame(Data$GeneSymbol)
+rownames(genename) <- rownames(Data)
+colnames(genename) <- "Gene.Symbol"
+#Data is already normalised using RMA-sketch
+analysis.name<-"BOT2" #Label analysis
+expressionMatrix<-Data[,1:8] #takes expression from normalised expression set
+
+
+Treat<-factor(rep(c("Control", "Patient"),c(5,3)), levels=c("Control", "Patient"))
+design<-model.matrix(~Treat)
+rownames(design)<-colnames(expressionMatrix)
+design
+
+#Conduct statistical analysis of expression
+library(limma)
+fit<-lmFit(expressionMatrix, design) #linear model fit
+fit<-eBayes(fit) 
+result<-topTable(fit, coef="TreatPatient", adjust="BH", number=nrow(expressionMatrix)) #"BH" adjust for multiple hypothesis testing
+#toptable normally takes top number but this takes all
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression")
+write.csv(result, file = paste(analysis.name, "_result.csv", sep = ""))
+
+
+result$"Fold Change"<-2^result$logFC 
+result$"Fold Change"[result$"Fold Change"<1]<-(-1)/result$"Fold Change"[result$"Fold Change"<1] #converts log fold change into a linear value above or below 0
+expressionLinear<-as.data.frame(2^expressionMatrix)
+expressionLinear$ProbeSetID<-rownames(expressionLinear)
+result<-merge(result, expressionLinear, by = 0) #merge values into one array
+result<-merge(result, genename, by.x = "Row.names", by.y = 0)
+result<-subset(result, subset=(Gene.Symbol !="---")) #if no gene symbol, discount
+
+
+setwd(dir = "/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/")
+write.csv(result, file=paste(analysis.name, "_finalresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+genesort <- result[order(result$P.Value),]
+uniqueresult <- genesort[!duplicated(genesort[,18]),]
+write.csv(uniqueresult, file=paste(analysis.name, "rankeduniqueresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+```
+
+I had to skip out a number of steps because it didn't require the annotation file. There were about 28000 rows left over which was quite a lot, though approximately 7000 were LOC transcripts so took us down to the number of genes you would expect. 
+
+
+After adding these two datasets to the FoldChange_PD.R script, and filtering out for ALS and sporadic PD blood, there were 85 upregulated and 109 downregulated genes. This still included MSX1, SNCA, UCHL1, and ALDH1A1 from PD Malacards but not PINK1 anymore.
+
+EnrichR
+UP: http://amp.pharm.mssm.edu/Enrichr/enrich?dataset=3t9ff
+DOWN: http://amp.pharm.mssm.edu/Enrichr/enrich?dataset=3t9fh
+
+
+# Change of direction
+
+The other datasets I had were fibroblasts from PARK2 and LRRK2 patients as provided by Robin Highly/Oliver Bandmann/Heather Mortiboys. These were exon array datasets which were analysed by Wenbin using the Affymetrix console. When these were added to the filters, the number of common genes was 36, only one of which MSX1 was retained. 
+
+To give a little more signal, but to also see if the signal could be recovered, I discluded the blood data (as fibroblast is representative enough of a non-neuronal tissue), leaving 54 genes
+
+DOCK2
+RAD52
+TNFAIP8
+P4HA1
+MS4A6A
+CD300A
+KLHL36
+TRIM5
+CD163
+CXCR4
+RIPK2
+PAWR
+ZNF516
+JMJD6
+CASP7
+MSX1
+IGF1R
+LRRC1
+SAFB2
+C1QB
+IL17RB
+LAMB2
+CCDC40
+CDA
+FMO5
+DNASE2
+NFE2
+ZNF217
+HMOX1
+PARP16
+HP1BP3
+PGPEP1
+CD14
+NPIPB15
+IMP4
+LETMD1
+AP1S1
+FHIT
+MECR
+ATP2B2
+DCTPP1
+WDYHV1
+PSMC2
+NRXN3
+MRTO4
+NDUFS3
+SLC6A1
+NME1
+MRPL15
+COPS3
+TUBG1
+PRC1
+BFSP1
+IARS
+
+
+Approximately 10 of these genes have a relatively strong relationship with Parkinson's or LRRK2 specifically. 32 were directly related according to VarElect, 22 indirectly related (VarElect_Results_cmgreen1-sheffield-ac-uk-20180522-014621619).
+
+
+The next step was to find the PPI partners of these 54 genes.
+
+# PPI 
+```{r, eval=F}
+#### ALS PARK2 LRRK2 ####
+
+library(biomaRt)
+
+setwd("/Users/clairegreen/Documents/PhD/TDP-43/TDP-43_Code/Results/PPI_Network/")
+
+PPI <- read.table("iref14_Human_UP_noDup_table_nodash.txt", header = T)
+braingenes <- read.csv("Zhang_BrainCelltype_Markers_braingenes.csv", header = T)
+
+DEG_list <- readLines("~/Documents/PhD/Parkinsons/Parkinsons_Code/Results/ALSPARK2LRRK2/removeallALLgenes.txt")
+
+mart <- useMart("ENSEMBL_MART_ENSEMBL",dataset="hsapiens_gene_ensembl", host="www.ensembl.org")
+attributes <- listAttributes(mart)
+mart_back <- getBM(attributes =c("hgnc_symbol", "uniprotswissprot"), filters="hgnc_symbol", values=DEG_list,  mart=mart)
+genelist_Uniprot <- subset(mart_back, !(mart_back$uniprotswissprot == ""))
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/ALSPARK2LRRK2/")
+write.csv(genelist_Uniprot, "martback.csv", row.names = F)
+
+# IDENTIFY MISSING GENES AND FIND UNIPROT CODES FOR THEM. NB SOME GENES MAY NOT BE PROTEIN CODING #
+
+mart_table <- read.csv("martback.csv", header = T) #A table with the uniprot codes for the DEGs
+uniprot_gene <- mart_table$uniprotswissprot
+
+DEG_PPI <- subset(PPI, PPI$V1 %in% uniprot_gene | PPI$V2 %in% uniprot_gene)
+rownames(DEG_PPI) <- 1:nrow(DEG_PPI)
+
+write.csv(DEG_PPI, "DEG_PPI_ALP.csv", row.names = F)
+
+DEG_PPI <- read.csv("DEG_PPI_ALP.csv")
+
+DEG_PPI <- subset(DEG_PPI, DEG_PPI$Gene1 !="-")
+DEG_PPI <- subset(DEG_PPI, DEG_PPI$Gene2 !="-")
+
+write.csv(DEG_PPI, "FinalPDPPI.csv", row.names = F, quote = F)
+```
+
+From this we have a network of 1367 interactions between 1034 proteins (file = PD_DEGPPI.R, DEG_PPI_ALP.csv, ALP_PPIgenes.txt. Gene names used).  
+
+Next I had to find the corresonding rows in each of the RNA expression data files ready for the correlation anaylysis. The LRRK2 samples were not included in the coexpression analysis because with only 2 and 3 patients respectively, it would results in rho values of 1/-1 or 1, 0.5, 0, -0.5 or 1, which are difficult to threshold. I also removed the MOR.FC dataset as the distribution of Rho values was abnormally distributed
+
+[]
+
+```{r, eval=F}
+#### ALP####
+#Read in network nodes
+DEG_PPI <- readLines("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/ALSPARK2LRRK2/ALP_PPIGenes.txt")
+
+setwd("/users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/")
+#Extract PPI network genes from each dataset#####
+LEW <- read.csv("LEWfilteredresult.csv")
+rownames(LEW) <- LEW$Gene.Symbol
+LEW <- LEW[,28:41]
+LEW <- subset(LEW, rownames(LEW) %in% DEG_PPI)
+
+MID3 <- read.csv("MID3filteredresult.csv")
+rownames(MID3) <- MID3$Gene.Symbol
+MID3 <- MID3[,36:49]
+MID3 <- subset(MID3, rownames(MID3) %in% DEG_PPI)
+
+MID4 <- read.csv("MID4filteredresult.csv")
+rownames(MID4) <- MID4$Gene.Symbol
+MID4 <- MID4[,41:55]
+MID4 <- subset(MID4, rownames(MID4) %in% DEG_PPI)
+
+MOR.FC <- read.csv("MOR.FCfilteredresult.csv")
+rownames(MOR.FC) <- MOR.FC$Gene.Symbol
+MOR.FC <- MOR.FC[,24:28]
+MOR.FC <- subset(MOR.FC, rownames(MOR.FC) %in% DEG_PPI)
+
+DIJ <- read.csv("DIJfilteredresult.csv")
+rownames(DIJ) <- DIJ$Gene.Symbol
+DIJ <- DIJ[,29:43]
+DIJ <- subset(DIJ, rownames(DIJ) %in% DEG_PPI)
+
+FFR <- read.csv("FFRfilteredresult.csv")
+rownames(FFR) <- FFR$Gene.Symbol
+FFR <- FFR[,29:44]
+FFR <- subset(FFR, rownames(FFR) %in% DEG_PPI)
+
+MID1 <- read.csv("MID1filteredresult.csv")
+rownames(MID1) <- MID1$Gene.Symbol
+MID1 <- MID1[,28:37]
+MID1 <- subset(MID1, rownames(MID1) %in% DEG_PPI)
+
+MID2 <- read.csv("MID2filteredresult.csv")
+rownames(MID2) <- MID2$Gene.Symbol
+MID2 <- MID2[,39:49]
+MID2 <- subset(MID2, rownames(MID2) %in% DEG_PPI)
+
+MOR.SN <- read.csv("MOR.SNfilteredresult.csv")
+rownames(MOR.SN) <- MOR.SN$Gene.Symbol
+MOR.SN <- MOR.SN[,36:59]
+MOR.SN <- subset(MOR.SN, rownames(MOR.SN) %in% DEG_PPI)
+
+DUM <- read.csv("DUM_UniqueGene_DESeq2.csv")
+rownames(DUM) <- DUM$hgnc_symbol
+DUM <- DUM[,53:81]
+DUM <- subset(DUM, rownames(DUM) %in% DEG_PPI)
+
+
+
+
+#Find the gene names that all datasets have in common
+DEG_com <- Reduce(intersect, list(rownames(DIJ), rownames(FFR), 
+                                  rownames(LEW),rownames(MID1),rownames(MID2),
+                                  rownames(MID3),rownames(MID4),rownames(MOR.FC),
+                                  rownames(MOR.SN), rownames(DUM)))
+```
+
+This script resulted in 854 common names. Correlation analysis was conducted on sharc (/shared/hidelab2/user/mdp15cmg/Parkinsons/PD_Cor)
+
+When the correlation relationships were downloaded and analysed, only 59 edges reached a consistent correlation value of over 0.1 or below -0.1 regardless of sign. This increases to 208 when the RNA-seq dataset is removed. 
+
+
+# Yet Another New Approach
+
+Talking to Kat we hypothesised that the Parkin Fibroblasts were perhaps driving away the signal too strongly. Also the number of samples was so small that it's not necessarily giving a representative signal. 
+
+To compensate, I decided to go back to the blood samples and use some other samples from the AMA GSE99039 dataset which have familial mutations. There were 5 ATP13A2 cases, 15 Parkin cases, and 12 PINK1 cases. Two of the Parkin cases in the metadata didn't have corresponding files, so this became 13 Parkin cases. 
+
+## Limma
+```{r, eval=f}
+##### AMA ATP13A2 #########
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Data/GSE99039_keepfiles/")
+
+#run program to choose .CEL files from directory
+celfiles <- fileBrowser(textToShow = "Choose CEL files", testFun = hasSuffix("[cC][eE][lL]"))
+Data<-ReadAffy(filenames=celfiles) #read in files
+rmaEset<-rma(Data) #normalise using RMA
+analysis.name<-"AMA_ATP13A2" #Label analysis
+dataMatrixAll<-exprs(rmaEset) #takes expression from normalised expression set
+
+
+#mas5call generates presence/absence calls for each probeset
+mas5call<-mas5calls(Data)
+callMatrixAll<-exprs(mas5call)
+colnames(callMatrixAll)<-sub(".CEL", ".mas5-Detection", colnames(callMatrixAll),fixed=TRUE)
+colnames(callMatrixAll)<-sub(".cel", ".mas5-Detection", colnames(callMatrixAll),fixed=TRUE)
+callMatrixAll<-as.data.frame(callMatrixAll)
+callMatrixAll$ProbeSetID<-rownames(callMatrixAll)
+countPf<-function(x){
+  sum(x=="P")
+}
+
+#count how many samples have presence calls
+countPl<-apply(callMatrixAll, 1, countPf)
+callMatrixAll$ProbeSetID<-rownames(callMatrixAll)
+countPdf<-data.frame(ProbeSetID=names(countPl), countP=countPl) 
+
+#read annotation
+# USING ANNOTATION FILE (if .csv, convert to .txt using excel)
+annotation.file<-"/Users/clairegreen/Documents/PhD/TDP-43/TDP-43_Data/HG-U133_Plus_2.na35.annot.csv/HG-U133_Plus_2.na35_SHORT.annot.txt"
+annotation<-read.table(annotation.file, header = TRUE, row.names=NULL, sep="\t", skip=0, stringsAsFactors=F, quote = "", comment.char="!", fill = TRUE, as.is = TRUE)
+dim(annotation)
+nrow(annotation)
+annotation<-subset( annotation, subset=(Gene.Symbol !="---")) #if no gene symbol, discount
+
+# Remove rows in which genes are noted to have negative strand matching probes
+idxNegativeStrand<-grep("Negative Strand Matching Probes", annotation$Annotation.Notes)
+if(length(idxNegativeStrand)>0)
+{
+  annotation<-annotation[-idxNegativeStrand,]
+}
+
+
+expressionMatrix<-exprs(rmaEset)
+colnames(expressionMatrix)
+
+#this is for matched samples
+Treat<-factor(rep(c("Control", "Patient"),c(183,5)), levels=c("Control", "Patient"))
+design<-model.matrix(~Treat)
+rownames(design)<-colnames(expressionMatrix)
+design
+
+#Conduct statistical analysis of expression
+library(limma)
+fit<-lmFit(expressionMatrix, design) #linear model fit
+fit<-eBayes(fit) 
+result<-topTable(fit, coef="TreatPatient", adjust="BH", number=nrow(expressionMatrix)) #"BH" adjust for multiple hypothesis testing
+#toptable normally takes top number but this takes all
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression")
+write.csv(result, file = paste(analysis.name, "_result.csv", sep = ""))
+
+result$"ProbeSetID"<-rownames(result) #make probeset IDs the row names
+head(result$"ProbeSetID") 
+result$"Fold Change"<-2^result$logFC 
+result$"Fold Change"[result$"Fold Change"<1]<-(-1)/result$"Fold Change"[result$"Fold Change"<1] #converts log fold change into a linear value above or below 0
+expressionLinear<-as.data.frame(2^expressionMatrix)
+expressionLinear$ProbeSetID<-rownames(expressionLinear)
+result<-merge(result, expressionLinear, by.x="ProbeSetID", by.y="ProbeSetID") #merge values into one array
+result<-merge(annotation, result, by.x="Probe.Set.ID", by.y="ProbeSetID")
+result<-merge(result, countPdf, by.x="Probe.Set.ID", by.y="ProbeSetID")
+result$Gene.Symbol <- sapply(strsplit(result$Gene.Symbol,"///"), `[`, 1)
+result$Ensembl <- sapply(strsplit(result$Ensembl,"///"), `[`, 1)
+
+setwd(dir = "/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/")
+write.csv(result, file=paste(analysis.name, "_finalresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+genesort <- result[order(result$P.Value),]
+uniqueresult <- genesort[!duplicated(genesort[,5]),]
+write.csv(uniqueresult, file=paste(analysis.name, "rankeduniqueresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+uniqueresult<-subset(uniqueresult, Gene.Symbol!="") #removes any probes for which there are no gene symbols
+uniqueresult<-subset(uniqueresult, subset=(countP>20)) #only takes results that have at least 2 samples with a presence call for a probe
+write.csv(uniqueresult, file=paste(analysis.name, "filteredresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+##### AMA PINK1 ##########
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Data/GSE99039_keepfiles/")
+
+#run program to choose .CEL files from directory
+celfiles <- fileBrowser(textToShow = "Choose CEL files", testFun = hasSuffix("[cC][eE][lL]"))
+Data<-ReadAffy(filenames=celfiles) #read in files
+rmaEset<-rma(Data) #normalise using RMA
+analysis.name<-"AMA_PINK1" #Label analysis
+dataMatrixAll<-exprs(rmaEset) #takes expression from normalised expression set
+
+
+#mas5call generates presence/absence calls for each probeset
+mas5call<-mas5calls(Data)
+callMatrixAll<-exprs(mas5call)
+colnames(callMatrixAll)<-sub(".CEL", ".mas5-Detection", colnames(callMatrixAll),fixed=TRUE)
+colnames(callMatrixAll)<-sub(".cel", ".mas5-Detection", colnames(callMatrixAll),fixed=TRUE)
+callMatrixAll<-as.data.frame(callMatrixAll)
+callMatrixAll$ProbeSetID<-rownames(callMatrixAll)
+countPf<-function(x){
+  sum(x=="P")
+}
+
+#count how many samples have presence calls
+countPl<-apply(callMatrixAll, 1, countPf)
+callMatrixAll$ProbeSetID<-rownames(callMatrixAll)
+countPdf<-data.frame(ProbeSetID=names(countPl), countP=countPl) 
+
+#read annotation
+# USING ANNOTATION FILE (if .csv, convert to .txt using excel)
+annotation.file<-"/Users/clairegreen/Documents/PhD/TDP-43/TDP-43_Data/HG-U133_Plus_2.na35.annot.csv/HG-U133_Plus_2.na35_SHORT.annot.txt"
+annotation<-read.table(annotation.file, header = TRUE, row.names=NULL, sep="\t", skip=0, stringsAsFactors=F, quote = "", comment.char="!", fill = TRUE, as.is = TRUE)
+dim(annotation)
+nrow(annotation)
+annotation<-subset( annotation, subset=(Gene.Symbol !="---")) #if no gene symbol, discount
+
+# Remove rows in which genes are noted to have negative strand matching probes
+idxNegativeStrand<-grep("Negative Strand Matching Probes", annotation$Annotation.Notes)
+if(length(idxNegativeStrand)>0)
+{
+  annotation<-annotation[-idxNegativeStrand,]
+}
+
+
+expressionMatrix<-exprs(rmaEset)
+colnames(expressionMatrix)
+
+#this is for matched samples
+Treat<-factor(rep(c("Control", "Patient"),c(183,12)), levels=c("Control", "Patient"))
+design<-model.matrix(~Treat)
+rownames(design)<-colnames(expressionMatrix)
+design
+
+#Conduct statistical analysis of expression
+library(limma)
+fit<-lmFit(expressionMatrix, design) #linear model fit
+fit<-eBayes(fit) 
+result<-topTable(fit, coef="TreatPatient", adjust="BH", number=nrow(expressionMatrix)) #"BH" adjust for multiple hypothesis testing
+#toptable normally takes top number but this takes all
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression")
+write.csv(result, file = paste(analysis.name, "_result.csv", sep = ""))
+
+result$"ProbeSetID"<-rownames(result) #make probeset IDs the row names
+head(result$"ProbeSetID") 
+result$"Fold Change"<-2^result$logFC 
+result$"Fold Change"[result$"Fold Change"<1]<-(-1)/result$"Fold Change"[result$"Fold Change"<1] #converts log fold change into a linear value above or below 0
+expressionLinear<-as.data.frame(2^expressionMatrix)
+expressionLinear$ProbeSetID<-rownames(expressionLinear)
+result<-merge(result, expressionLinear, by.x="ProbeSetID", by.y="ProbeSetID") #merge values into one array
+result<-merge(annotation, result, by.x="Probe.Set.ID", by.y="ProbeSetID")
+result<-merge(result, countPdf, by.x="Probe.Set.ID", by.y="ProbeSetID")
+result$Gene.Symbol <- sapply(strsplit(result$Gene.Symbol,"///"), `[`, 1)
+result$Ensembl <- sapply(strsplit(result$Ensembl,"///"), `[`, 1)
+
+setwd(dir = "/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/")
+write.csv(result, file=paste(analysis.name, "_finalresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+genesort <- result[order(result$P.Value),]
+uniqueresult <- genesort[!duplicated(genesort[,5]),]
+write.csv(uniqueresult, file=paste(analysis.name, "rankeduniqueresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+uniqueresult<-subset(uniqueresult, Gene.Symbol!="") #removes any probes for which there are no gene symbols
+uniqueresult<-subset(uniqueresult, subset=(countP>20)) #only takes results that have at least 2 samples with a presence call for a probe
+write.csv(uniqueresult, file=paste(analysis.name, "filteredresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+##### AMA PARKIN ##########
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Data/GSE99039_keepfiles/")
+
+#run program to choose .CEL files from directory
+celfiles <- fileBrowser(textToShow = "Choose CEL files", testFun = hasSuffix("[cC][eE][lL]"))
+Data<-ReadAffy(filenames=celfiles) #read in files
+rmaEset<-rma(Data) #normalise using RMA
+analysis.name<-"AMA_PARKIN" #Label analysis
+dataMatrixAll<-exprs(rmaEset) #takes expression from normalised expression set
+
+
+#mas5call generates presence/absence calls for each probeset
+mas5call<-mas5calls(Data)
+callMatrixAll<-exprs(mas5call)
+colnames(callMatrixAll)<-sub(".CEL", ".mas5-Detection", colnames(callMatrixAll),fixed=TRUE)
+colnames(callMatrixAll)<-sub(".cel", ".mas5-Detection", colnames(callMatrixAll),fixed=TRUE)
+callMatrixAll<-as.data.frame(callMatrixAll)
+callMatrixAll$ProbeSetID<-rownames(callMatrixAll)
+countPf<-function(x){
+  sum(x=="P")
+}
+
+#count how many samples have presence calls
+countPl<-apply(callMatrixAll, 1, countPf)
+callMatrixAll$ProbeSetID<-rownames(callMatrixAll)
+countPdf<-data.frame(ProbeSetID=names(countPl), countP=countPl) 
+
+#read annotation
+# USING ANNOTATION FILE (if .csv, convert to .txt using excel)
+annotation.file<-"/Users/clairegreen/Documents/PhD/TDP-43/TDP-43_Data/HG-U133_Plus_2.na35.annot.csv/HG-U133_Plus_2.na35_SHORT.annot.txt"
+annotation<-read.table(annotation.file, header = TRUE, row.names=NULL, sep="\t", skip=0, stringsAsFactors=F, quote = "", comment.char="!", fill = TRUE, as.is = TRUE)
+dim(annotation)
+nrow(annotation)
+annotation<-subset( annotation, subset=(Gene.Symbol !="---")) #if no gene symbol, discount
+
+# Remove rows in which genes are noted to have negative strand matching probes
+idxNegativeStrand<-grep("Negative Strand Matching Probes", annotation$Annotation.Notes)
+if(length(idxNegativeStrand)>0)
+{
+  annotation<-annotation[-idxNegativeStrand,]
+}
+
+
+expressionMatrix<-exprs(rmaEset)
+colnames(expressionMatrix)
+
+#this is for matched samples
+Treat<-factor(rep(c("Control", "Patient"),c(183,13)), levels=c("Control", "Patient"))
+design<-model.matrix(~Treat)
+rownames(design)<-colnames(expressionMatrix)
+design
+
+#Conduct statistical analysis of expression
+library(limma)
+fit<-lmFit(expressionMatrix, design) #linear model fit
+fit<-eBayes(fit) 
+result<-topTable(fit, coef="TreatPatient", adjust="BH", number=nrow(expressionMatrix)) #"BH" adjust for multiple hypothesis testing
+#toptable normally takes top number but this takes all
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression")
+write.csv(result, file = paste(analysis.name, "_result.csv", sep = ""))
+
+result$"ProbeSetID"<-rownames(result) #make probeset IDs the row names
+head(result$"ProbeSetID") 
+result$"Fold Change"<-2^result$logFC 
+result$"Fold Change"[result$"Fold Change"<1]<-(-1)/result$"Fold Change"[result$"Fold Change"<1] #converts log fold change into a linear value above or below 0
+expressionLinear<-as.data.frame(2^expressionMatrix)
+expressionLinear$ProbeSetID<-rownames(expressionLinear)
+result<-merge(result, expressionLinear, by.x="ProbeSetID", by.y="ProbeSetID") #merge values into one array
+result<-merge(annotation, result, by.x="Probe.Set.ID", by.y="ProbeSetID")
+result<-merge(result, countPdf, by.x="Probe.Set.ID", by.y="ProbeSetID")
+result$Gene.Symbol <- sapply(strsplit(result$Gene.Symbol,"///"), `[`, 1)
+result$Ensembl <- sapply(strsplit(result$Ensembl,"///"), `[`, 1)
+
+setwd(dir = "/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/")
+write.csv(result, file=paste(analysis.name, "_finalresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+genesort <- result[order(result$P.Value),]
+uniqueresult <- genesort[!duplicated(genesort[,5]),]
+write.csv(uniqueresult, file=paste(analysis.name, "rankeduniqueresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+
+uniqueresult<-subset(uniqueresult, Gene.Symbol!="") #removes any probes for which there are no gene symbols
+uniqueresult<-subset(uniqueresult, subset=(countP>20)) #only takes results that have at least 2 samples with a presence call for a probe
+write.csv(uniqueresult, file=paste(analysis.name, "filteredresult.csv", sep=""), row.names=FALSE, quote = FALSE)
+```
+
+## Common Differentially Expressed Genes (Blood Edition)
+```{r, eval=f}
+#############################################################
+################### FOLD CHANGE DEG #########################
+#############################################################
+
+setwd("/users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/")
+
+LEW <- read.csv("LEWfilteredresult.csv")
+LEW <- LEW[order(LEW$P.Value),]
+MID3 <- read.csv("MID3filteredresult.csv")
+MID3 <- MID3[order(MID3$P.Value),]
+MID4 <- read.csv("MID4filteredresult.csv")
+MID4 <- MID4[order(MID4$P.Value),]
+MOR.FC <- read.csv("MOR.FCfilteredresult.csv")
+MOR.FC <- MOR.FC[order(MOR.FC$P.Value),]
+DIJ <- read.csv("DIJfilteredresult.csv")
+DIJ <- DIJ[order(DIJ$P.Value),]
+FFR <- read.csv("FFRfilteredresult.csv")
+FFR <- FFR[order(FFR$P.Value),]
+MID1 <- read.csv("MID1filteredresult.csv")
+MID1 <- MID1[order(MID1$P.Value),]
+MID2 <- read.csv("MID2filteredresult.csv")
+MID2 <- MID2[order(MID2$P.Value),]
+MOR.SN <- read.csv("MOR.SNfilteredresult.csv")
+MOR.SN <- MOR.SN[order(MOR.SN$P.Value),]
+DUM <- read.csv("DUM_UniqueGene_DESeq2.csv")
+DUM <- DUM[order(DUM$pvalue),]
+BOT <- read.csv("BOTrankeduniqueresult.csv")
+BOT <- BOT[order(BOT$P.Value),]
+BOT2 <- read.csv("BOT2rankeduniqueresult.csv")
+BOT2 <- BOT2[order(BOT2$P.Value),]
+
+
+
+
+thresh <- 1
+
+upLEW <- subset(LEW, LEW$Fold.Change >= thresh)
+upLEWgene <- upLEW$Gene.Symbol
+
+upMID3<- subset(MID3, MID3$Fold.Change >= thresh)
+upMID3gene <- upMID3$Gene.Symbol
+
+upMID4 <- subset(MID4, MID4$Fold.Change >= thresh)
+upMID4gene <- upMID4$Gene.Symbol
+
+upMOR.FC <- subset(MOR.FC, MOR.FC$Fold.Change >= thresh)
+upMOR.FCgene <- upMOR.FC$Gene.Symbol
+
+upDUM <- subset(DUM, DUM$log2FoldChange >= 0)
+upDUMgene <- upDUM$hgnc_symbol
+
+upDIJ <- subset(DIJ, DIJ$Fold.Change >= thresh)
+upDIJgene <- upDIJ$Gene.Symbol
+
+upFFR<- subset(FFR, FFR$Fold.Change >= thresh)
+upFFRgene <- upFFR$Gene.Symbol
+
+upMID1<- subset(MID1, MID1$Fold.Change >= thresh)
+upMID1gene <- upMID1$Gene.Symbol
+
+upMID2 <- subset(MID2, MID2$Fold.Change >= thresh)
+upMID2gene <- upMID2$Gene.Symbol
+
+upMOR.SN <- subset(MOR.SN, MOR.SN$Fold.Change >= thresh)
+upMOR.SNgene <- upMOR.SN$Gene.Symbol
+
+upBOT <- subset(BOT, BOT$Fold.Change >= thresh)
+upBOTgene <- upBOT$Gene.Symbol
+
+upBOT2 <- subset(BOT2, BOT2$Fold.Change >= thresh)
+upBOT2gene <- upBOT2$Gene.Symbol
+
+
+INTUP <- Reduce(intersect, list(upLEWgene, upMID3gene, upMID4gene, upMOR.FCgene,
+                                upDIJgene, upFFRgene, upMID1gene, upMID2gene, upMOR.SNgene, upDUMgene, upBOTgene, upBOT2gene))
+
+
+
+#### DOWN ####
+thresh <- -1
+
+downLEW <- subset(LEW, LEW$Fold.Change <= thresh)
+downLEWgene <- downLEW$Gene.Symbol
+
+downMID3 <- subset(MID3, MID3$Fold.Change <= thresh)
+downMID3gene <- downMID3$Gene.Symbol
+
+downMID4 <- subset(MID4, MID4$Fold.Change <= thresh)
+downMID4gene <- downMID4$Gene.Symbol
+
+downMOR.FC <- subset(MOR.FC, MOR.FC$Fold.Change <= thresh)
+downMOR.FCgene <- downMOR.FC$Gene.Symbol
+
+downDUM <- subset(DUM, DUM$log2FoldChange <= 0)
+downDUMgene <- downDUM$hgnc_symbol
+
+downDIJ <- subset(DIJ, DIJ$Fold.Change <= thresh)
+downDIJgene <- downDIJ$Gene.Symbol
+
+downFFR<- subset(FFR, FFR$Fold.Change <= thresh)
+downFFRgene <- downFFR$Gene.Symbol
+
+downMID1<- subset(MID1, MID1$Fold.Change <= thresh)
+downMID1gene <- downMID1$Gene.Symbol
+
+downMID2 <- subset(MID2, MID2$Fold.Change <= thresh)
+downMID2gene <- downMID2$Gene.Symbol
+
+downMOR.SN <- subset(MOR.SN, MOR.SN$Fold.Change <= thresh)
+downMOR.SNgene <- downMOR.SN$Gene.Symbol
+
+
+downBOT <- subset(BOT, BOT$Fold.Change <= thresh)
+downBOTgene <- downBOT$Gene.Symbol
+
+downBOT2 <- subset(BOT2, BOT2$Fold.Change <= thresh)
+downBOT2gene <- downBOT2$Gene.Symbol
+
+INTDOWN <- Reduce(intersect, list(downLEWgene, downMID3gene, downMID4gene, downMOR.FCgene,
+                                  downDIJgene, downFFRgene, downMID1gene, downMID2gene, 
+                                  downMOR.SNgene, downDUMgene, downBOTgene, downBOT2gene))
+
+
+
+
+########################### COMMON GENES ##############################
+all <- c(INTUP, INTDOWN)
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/FoldChange")
+# write.table(INTUP,"Sp_LRRK2_upDEGs.txt", row.names = F, col.names = F, quote = F)
+# write.table(INTDOWN,"Sp_LRRK2_downDEGs.txt", row.names = F, col.names = F, quote = F)
+# write.table(all, "Sp_LRRK2_allDEGs.txt", row.names = F, col.names = F, quote = F)
+
+PDgenes <- readLines("/Users/clairegreen/Documents/PhD/Parkinsons/ParkinsonsDiseaseMalacards.txt")
+
+intersect(INTUP, PDgenes)
+intersect(INTDOWN, PDgenes)
+
+
+
+####### ALS signature ##########
+
+setwd("/users/clairegreen/Documents/PhD/TDP-43/TDP-43_Code/Results/GeneExpression/noMedian/")
+
+C9 <- read.csv("C9_unique.csv")
+C9 <- C9[order(C9$P.Value),]
+sals <- read.csv("sals_unique.csv")
+sals <- sals[order(sals$P.Value),]
+
+setwd("/users/clairegreen/Documents/PhD/TDP-43/TDP-43_Code/Results/GeneExpression/TDP-43_DEseq2/")
+
+pet <- read.csv("PET_results_keepfiltering.csv")
+rav <- read.csv("RAV_results_keepfiltering.csv")
+
+setwd("/users/clairegreen/Documents/PhD/TDP-43/TDP-43_Code/Results/GeneExpression/non-TDP/")
+
+FUS <- read.csv("FUSrankeduniqueresult.csv")
+FUS <- FUS[order(FUS$P.Value),]
+SOD1 <- read.csv("SOD1rankeduniqueresult.csv")
+SOD1 <- SOD1[order(SOD1$P.Value),]
+
+
+thresh <- 1
+
+upC9 <- subset(C9, C9$Fold.Change >= thresh)
+upC9gene <- upC9$Gene.Symbol
+
+upSALS <- subset(sals, sals$Fold.Change >= thresh)
+upSALSgene <- upSALS$Gene.Symbol
+
+upPET <- subset(pet, pet$FoldChange >= thresh)
+upPETgene <- upPET$hgnc_symbol
+
+upRAV <- subset(rav, rav$FoldChange >= thresh)
+upRAVgene <- upRAV$hgnc_symbol
+
+upFUS <- subset(FUS, FUS$Fold.Change >= thresh)
+upFUSgene <- upFUS$Gene.Symbol
+
+upSOD1 <- subset(SOD1, SOD1$Fold.Change >= thresh)
+upSOD1gene <- upSOD1$Gene.Symbol
+
+INTUP_ALS <- Reduce(intersect, list(upC9gene, upSALSgene, upPETgene, upRAVgene, upFUSgene, upSOD1gene))
+
+
+#### DOWN 
+thresh <- -1
+
+downC9 <- subset(C9, C9$Fold.Change <= thresh)
+downC9gene <- downC9$Gene.Symbol
+
+downSALS <- subset(sals, sals$Fold.Change <= thresh)
+downSALSgene <- downSALS$Gene.Symbol
+
+downPET <- subset(pet, pet$FoldChange <= thresh)
+downPETgene <- downPET$hgnc_symbol
+
+downRAV <- subset(rav, rav$FoldChange <= thresh)
+downRAVgene <- downRAV$hgnc_symbol
+
+downFUS <- subset(FUS, FUS$Fold.Change <= thresh)
+downFUSgene <- downFUS$Gene.Symbol
+
+downSOD1 <- subset(SOD1, SOD1$Fold.Change <= thresh)
+downSOD1gene <- downSOD1$Gene.Symbol
+
+INTDOWN_ALS <- Reduce(intersect, list(downC9gene, downSALSgene, downPETgene, downRAVgene, downFUSgene, downSOD1gene))
+
+
+
+##### COMMON GENES ###
+upremove <- Reduce(intersect, list (INTUP, INTUP_ALS))
+downremove <- Reduce(intersect, list(INTDOWN, INTDOWN_ALS))
+
+
+
+###### REMOVE COMMON GENES ###
+resultsup <- subset(INTUP, !(INTUP %in% upremove))
+resultsdown <- subset(INTDOWN, !(INTDOWN %in% downremove))
+results <- c(resultsup, resultsdown)
+
+####### sPD Blood signature ##########
+
+setwd("/users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/")
+
+AMA <- read.csv("AMAfilteredresult.csv")
+AMA <- AMA[order(AMA$P.Value),]
+RON <- read.csv("RONfilteredresult.csv")
+RON <- RON[order(RON$P.Value),]
+
+
+thresh <- 1
+
+upAMA <- subset(AMA, AMA$Fold.Change >= thresh)
+upAMAgene <- upAMA$Gene.Symbol
+
+upRON <- subset(RON, RON$Fold.Change >= thresh)
+upRONgene <- upRON$Gene.Symbol
+
+
+INTUP_blood <- Reduce(intersect, list(upAMAgene, upRONgene))
+
+
+#### DOWN ###
+thresh <- -1
+
+downAMA <- subset(AMA, AMA$Fold.Change <= thresh)
+downAMAgene <- downAMA$Gene.Symbol
+
+downRON <- subset(RON, RON$Fold.Change <= thresh)
+downRONgene <- downRON$Gene.Symbol
+
+
+INTDOWN_blood <- Reduce(intersect, list(downAMAgene, downRONgene))
+
+
+
+##### COMMON GENES ###
+upremove2 <- Reduce(intersect, list(INTUP, INTUP_blood))
+downremove2 <- Reduce(intersect, list(INTDOWN, INTDOWN_blood))
+
+
+
+##### REMOVE COMMON GENES ###
+resultsup <- subset(resultsup, !(resultsup %in% upremove2))
+resultsdown <- subset(resultsdown, !(resultsdown %in% downremove2))
+results <- c(resultsup, resultsdown)
+
+
+
+
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/FoldChange/")
+# write.table(resultsup, "Sp_LRRK2_FiltALSPDblood_UPgenes.txt", quote = F, row.names = F, col.names = F)
+# write.table(resultsdown, "Sp_LRRK2_FiltALSPDblood_DOWNgenes.txt", quote = F, row.names = F, col.names = F)
+# write.table(results, "Sp_LRRK2_FiltALSPDblood_ALLgenes.txt", quote = F, row.names = F, col.names = F)
+# cat(resultsup, sep="\n")
+
+intersect(resultsup, PDgenes)
+intersect(resultsdown, PDgenes)
+
+
+####### fPD Blood signature ##########
+
+setwd("/users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/")
+
+AMA_A <- read.csv("AMA_ATP13A2filteredresult.csv")
+AMA_A <- AMA_A[order(AMA_A$P.Value),]
+AMA_PARK <- read.csv("AMA_PARKINfilteredresult.csv")
+AMA_PARK <- AMA_PARK[order(AMA_PARK$P.Value),]
+AMA_PINK <- read.csv("AMA_PINK1filteredresult.csv")
+AMA_PINK <- AMA_PINK[order(AMA_PINK$P.Value),]
+
+
+thresh <- 1
+
+upAMA_A <- subset(AMA_A, AMA_A$Fold.Change >= thresh)
+upAMA_Agene <- AMA_A$Gene.Symbol
+
+upAMA_PARK<- subset(AMA_PARK, AMA_PARK$Fold.Change >= thresh)
+upAMA_PARKgene <- upAMA_PARK$Gene.Symbol
+
+upAMA_PINK<- subset(AMA_PINK, AMA_PINK$Fold.Change >= thresh)
+upAMA_PINKgene <- upAMA_PINK$Gene.Symbol
+
+
+INTUP_fam_blood <- Reduce(intersect, list(upAMA_Agene, upAMA_PARKgene, upAMA_PINKgene))
+
+
+#### DOWN ###
+thresh <- -1
+
+downAMA_A <- subset(AMA_A, AMA_A$Fold.Change <= thresh)
+downAMA_Agene <- AMA_A$Gene.Symbol
+
+downAMA_PARK<- subset(AMA_PARK, AMA_PARK$Fold.Change <= thresh)
+downAMA_PARKgene <- downAMA_PARK$Gene.Symbol
+
+downAMA_PINK<- subset(AMA_PINK, AMA_PINK$Fold.Change <= thresh)
+downAMA_PINKgene <- downAMA_PINK$Gene.Symbol
+
+
+INTDOWN_fam_blood <- Reduce(intersect, list(downAMA_Agene, downAMA_PARKgene, downAMA_PINKgene))
+
+
+
+##### COMMON GENES ###
+upremove3 <- Reduce(intersect, list(INTUP, INTUP_fam_blood))
+downremove3 <- Reduce(intersect, list(INTDOWN, INTDOWN_fam_blood))
+
+
+
+##### REMOVE COMMON GENES ###
+resultsup <- subset(resultsup, !(resultsup %in% upremove3))
+resultsdown <- subset(resultsdown, !(resultsdown %in% downremove3))
+results <- c(resultsup, resultsdown)
+
+
+
+
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/")
+write.table(resultsup, "ALS_sfblood_UPgenes.txt", quote = F, row.names = F, col.names = F)
+write.table(resultsdown, "ALS_sfblood_DOWNgenes.txt", quote = F, row.names = F, col.names = F)
+write.table(results, "ALS_sfblood_ALLgenes.txt", quote = F, row.names = F, col.names = F)
+cat(resultsup, sep="\n")
+
+intersect(resultsup, PDgenes)
+intersect(resultsdown, PDgenes)
+```
+
