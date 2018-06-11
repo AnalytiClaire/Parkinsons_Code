@@ -59,7 +59,7 @@ expressionMatrix<-exprs(rmaEset)
 colnames(expressionMatrix)
 
 #this is for matched samples
-Treat<-factor(rep(c("Control", "Patient"),c(8,14)), levels=c("Control", "Patient"))
+Treat<-factor(rep(c("Control", "Patient"),c(4,6)), levels=c("Control", "Patient"))
 design<-model.matrix(~Treat)
 rownames(design)<-colnames(expressionMatrix)
 design

@@ -4,6 +4,13 @@ author: "Claire Green"
 date: "28/02/2018"
 output: html_document
 ---
+<style type="text/css">
+.main-container {
+  max-width: 1800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
 
 #Data Sets
 
@@ -27,7 +34,6 @@ Datasets were searched for using the same filters as before - must be human tiss
 #Quality Control - PD_QC.R
 
 Checked data distribution using PCA and boxplots. Some of the datasets have quite mixed samples wereas others separate quite nicely into controls and patients. Boxplots didn't suggest any samples were outliers.
-
 
 ```{r, out.width = "900px", out.height = "700px", echo=F}
 knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/QC/QC_plots.pdf")
@@ -1369,3 +1375,403 @@ knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_
 
 http://amp.pharm.mssm.edu/Enrichr/enrich?dataset=3zurx
 
+The enrichments suggest that there is an immune process signal. There is also still an enrichment in the mitochondria for GO Cellular Component.
+
+
+# Rerunning after removal of LEW samples
+
+I realised after looking more closely at the paper that the LEW samples had some olivary nucleus samples which were supposed to be unaffected controls. Removing these samples meant I needed to essentially run everything again (again).
+
+## Common DEGs
+
+Rerunning left 210 genes this time (ALS_sfblood_ALLgenes.txt). 
+```
+> intersect(resultsup, PDgenes)
+[1] "MSX1" "SPR" 
+> intersect(resultsdown, PDgenes)
+[1] "SNCA"    "ALDH1A1" "UCHL1"   "CYCS"  
+```
+
+Functional enrichment in EnrichR for [upregulated](http://amp.pharm.mssm.edu/Enrichr/enrich?dataset=41d5a) and [downregulated](http://amp.pharm.mssm.edu/Enrichr/enrich?dataset=41d5z) genes. Upregulated signal isn't entirely clear; a number of signalling and DNA-binding pathways are enriched but not with the strongest p values. Alternatively there is quite a strong signal in the downregulated genes. A number of neurodegenerative pathways (inc Parkinson's disease) are enriched, as well as the electron transport chain/mitochondrial processes (mitochondrion (GO:0005739)	padj = 4.711e-8, 23 genes). GO Biological Process also implicates autophagy, which highlights the presence of CHMP2B - a causative ALS/FTLD gene.
+
+| Symbol    | Description                                                  | Category       | GIFTs | Matched Phenotypes                                        | Matched Phenotypes Scount | Global Rank (Total Genes 11967) | Score  |
+|-----------|--------------------------------------------------------------|----------------|-------|-----------------------------------------------------------|---------------------------|---------------------------------|--------|
+| SNCA      | Synuclein Alpha                                              | Protein Coding | 61    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 2                               | 378.27 |
+| UCHL1     | Ubiquitin C-Terminal Hydrolase L1                            | Protein Coding | 62    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 7                               | 209.64 |
+| CYCS      | Cytochrome C, Somatic                                        | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 63                              | 63.23  |
+| NDUFV2    | NADH:Ubiquinone Oxidoreductase Core Subunit V2               | Protein Coding | 53    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 106                             | 51.16  |
+| ALDH1A1   | Aldehyde Dehydrogenase 1 Family Member A1                    | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 153                             | 42.23  |
+| SPR       | Sepiapterin Reductase                                        | Protein Coding | 58    | Parkinson's Disease, LRRK2, late-onset                    | 3                         | 126                             | 40.38  |
+| MSX1      | Msh Homeobox 1                                               | Protein Coding | 55    | Parkinson's Disease, LRRK2, late-onset                    | 3                         | 169                             | 33.61  |
+| NDUFS1    | NADH:Ubiquinone Oxidoreductase Core Subunit S1               | Protein Coding | 56    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 213                             | 28.87  |
+| NDUFS3    | NADH:Ubiquinone Oxidoreductase Core Subunit S3               | Protein Coding | 56    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 236                             | 26.54  |
+| SYT11     | Synaptotagmin 11                                             | Protein Coding | 50    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 239                             | 22.93  |
+| CASP7     | Caspase 7                                                    | Protein Coding | 59    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 309                             | 21.45  |
+| TOMM20    | Translocase Of Outer Mitochondrial Membrane 20               | Protein Coding | 48    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 362                             | 16.56  |
+| MFN2      | Mitofusin 2                                                  | Protein Coding | 59    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 424                             | 16.55  |
+| IGF1R     | Insulin Like Growth Factor 1 Receptor                        | Protein Coding | 66    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 435                             | 16.27  |
+| MAP1B     | Microtubule Associated Protein 1B                            | Protein Coding | 51    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 474                             | 15.18  |
+| TMEM126B  | Transmembrane Protein 126B                                   | Protein Coding | 47    | Parkinson's Disease, LRRK2                                | 2                         | 363                             | 13.45  |
+| PTS       | 6-Pyruvoyltetrahydropterin Synthase                          | Protein Coding | 57    | Parkinson's Disease, late-onset, neurodegeneration        | 3                         | 556                             | 11.88  |
+| CASP6     | Caspase 6                                                    | Protein Coding | 57    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 573                             | 11.74  |
+| RAB7A     | RAB7A, Member RAS Oncogene Family                            | Protein Coding | 58    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 759                             | 11.00  |
+| PPP2R2B   | Protein Phosphatase 2 Regulatory Subunit Bbeta               | Protein Coding | 55    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 788                             | 10.69  |
+| PYROXD1   | Pyridine Nucleotide-Disulphide Oxidoreductase Domain 1       | Protein Coding | 44    | Parkinson's Disease, late-onset                           | 2                         | 487                             | 10.60  |
+| AGRP      | Agouti Related Neuropeptide                                  | Protein Coding | 51    | late-onset, neurodegeneration                             | 2                         | 504                             | 10.27  |
+| AIFM1     | Apoptosis Inducing Factor Mitochondria Associated 1          | Protein Coding | 59    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 898                             | 9.70   |
+| FLT1      | Fms Related Tyrosine Kinase 1                                | Protein Coding | 62    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 952                             | 9.26   |
+| RTN4      | Reticulon 4                                                  | Protein Coding | 54    | LRRK2, late-onset, neurodegeneration                      | 3                         | 792                             | 9.21   |
+| DYNC1H1   | Dynein Cytoplasmic 1 Heavy Chain 1                           | Protein Coding | 54    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 965                             | 9.11   |
+| TUBA4A    | Tubulin Alpha 4a                                             | Protein Coding | 56    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 968                             | 9.09   |
+| CHMP2B    | Charged Multivesicular Body Protein 2B                       | Protein Coding | 53    | Parkinson's Disease, late-onset, neurodegeneration        | 3                         | 894                             | 8.43   |
+| RGS2      | Regulator Of G Protein Signaling 2                           | Protein Coding | 51    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 944                             | 8.07   |
+| HIST1H1C  | Histone Cluster 1 H1 Family Member C                         | Protein Coding | 48    | Parkinson's Disease                                       | 1                         | 520                             | 7.11   |
+| PAWR      | Pro-Apoptotic WT1 Regulator                                  | Protein Coding | 48    | Parkinson's Disease, neurodegeneration                    | 2                         | 982                             | 6.36   |
+| MS4A6A    | Membrane Spanning 4-Domains A6A                              | Protein Coding | 45    | Parkinson's Disease, late-onset, neurodegeneration        | 3                         | 1259                            | 6.26   |
+| MYO1C     | Myosin IC                                                    | Protein Coding | 53    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1362                            | 5.78   |
+| SUMO1     | Small Ubiquitin-Like Modifier 1                              | Protein Coding | 56    | Parkinson's Disease, neurodegeneration                    | 2                         | 1277                            | 5.04   |
+| ACLY      | ATP Citrate Lyase                                            | Protein Coding | 53    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1577                            | 4.91   |
+| SDHA      | Succinate Dehydrogenase Complex Flavoprotein Subunit A       | Protein Coding | 56    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 1850                            | 4.77   |
+| PGF       | Placental Growth Factor                                      | Protein Coding | 54    | LRRK2, late-onset                                         | 2                         | 1361                            | 4.72   |
+| TRADD     | TNFRSF1A Associated Via Death Domain                         | Protein Coding | 51    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1694                            | 4.57   |
+| HSPA1L    | Heat Shock Protein Family A (Hsp70) Member 1 Like            | Protein Coding | 52    | Parkinson's Disease, LRRK2                                | 2                         | 1457                            | 4.38   |
+| GABBR2    | Gamma-Aminobutyric Acid Type B Receptor Subunit 2            | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset                    | 3                         | 1880                            | 4.04   |
+| PGAM1     | Phosphoglycerate Mutase 1                                    | Protein Coding | 54    | Parkinson's Disease, neurodegeneration                    | 2                         | 1602                            | 3.95   |
+| ATP6V1E1  | ATPase H+ Transporting V1 Subunit E1                         | Protein Coding | 52    | Parkinson's Disease, LRRK2, late-onset                    | 3                         | 2008                            | 3.70   |
+| FZD5      | Frizzled Class Receptor 5                                    | Protein Coding | 57    | Parkinson's Disease, LRRK2                                | 2                         | 1718                            | 3.67   |
+| MRPS22    | Mitochondrial Ribosomal Protein S22                          | Protein Coding | 50    | Parkinson's Disease, neurodegeneration                    | 2                         | 1776                            | 3.54   |
+| PLIN2     | Perilipin 2                                                  | Protein Coding | 51    | late-onset, neurodegeneration                             | 2                         | 1805                            | 3.47   |
+| CIRBP     | Cold Inducible RNA Binding Protein                           | Protein Coding | 48    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2119                            | 3.38   |
+| SNX10     | Sorting Nexin 10                                             | Protein Coding | 49    | Parkinson's Disease, LRRK2                                | 2                         | 1913                            | 3.22   |
+| FABP3     | Fatty Acid Binding Protein 3                                 | Protein Coding | 54    | Parkinson's Disease, neurodegeneration                    | 2                         | 1947                            | 3.13   |
+| BCAT2     | Branched Chain Amino Acid Transaminase 2                     | Protein Coding | 53    | Parkinson's Disease, neurodegeneration                    | 2                         | 1987                            | 3.05   |
+| ADH1B     | Alcohol Dehydrogenase 1B (Class I), Beta Polypeptide         | Protein Coding | 53    | Parkinson's Disease, late-onset                           | 2                         | 2004                            | 3.03   |
+| RARRES2   | Retinoic Acid Receptor Responder 2                           | Protein Coding | 50    | late-onset                                                | 1                         | 1536                            | 2.92   |
+| DNAJC24   | DnaJ Heat Shock Protein Family (Hsp40) Member C24            | Protein Coding | 44    | LRRK2, late-onset                                         | 2                         | 2118                            | 2.76   |
+| PRPF4     | Pre-MRNA Processing Factor 4                                 | Protein Coding | 51    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2366                            | 2.55   |
+| FLCN      | Folliculin                                                   | Protein Coding | 50    | Parkinson's Disease, late-onset                           | 2                         | 2227                            | 2.46   |
+| COPS5     | COP9 Signalosome Subunit 5                                   | Protein Coding | 51    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2450                            | 2.31   |
+| ENOPH1    | Enolase-Phosphatase 1                                        | Protein Coding | 49    | Parkinson's Disease                                       | 1                         | 2186                            | 1.83   |
+| ZC3HAV1   | Zinc Finger CCCH-Type Containing, Antiviral 1                | Protein Coding | 46    | Parkinson's Disease, neurodegeneration                    | 2                         | 2481                            | 1.81   |
+| PLCG1     | Phospholipase C Gamma 1                                      | Protein Coding | 56    | Parkinson's Disease, LRRK2                                | 2                         | 2492                            | 1.80   |
+| STAB1     | Stabilin 1                                                   | Protein Coding | 48    | Parkinson's Disease                                       | 1                         | 2218                            | 1.76   |
+| HP1BP3    | Heterochromatin Protein 1 Binding Protein 3                  | Protein Coding | 44    | Parkinson's Disease, neurodegeneration                    | 2                         | 2528                            | 1.71   |
+| MLLT11    | MLLT11, Transcription Factor 7 Cofactor                      | Protein Coding | 45    | late-onset                                                | 1                         | 2261                            | 1.68   |
+| AGL       | Amylo-Alpha-1, 6-Glucosidase, 4-Alpha-Glucanotransferase     | Protein Coding | 55    | late-onset                                                | 1                         | 2261                            | 1.68   |
+| MAVS      | Mitochondrial Antiviral Signaling Protein                    | Protein Coding | 50    | late-onset                                                | 1                         | 2261                            | 1.68   |
+| TAZ       | Tafazzin                                                     | Protein Coding | 52    | late-onset                                                | 1                         | 2261                            | 1.68   |
+| SLC6A1    | Solute Carrier Family 6 Member 1                             | Protein Coding | 57    | Parkinson's Disease, neurodegeneration                    | 2                         | 2545                            | 1.67   |
+| STAT4     | Signal Transducer And Activator Of Transcription 4           | Protein Coding | 56    | LRRK2, late-onset                                         | 2                         | 2559                            | 1.63   |
+| EIF4E     | Eukaryotic Translation Initiation Factor 4E                  | Protein Coding | 59    | Parkinson's Disease, LRRK2                                | 2                         | 2565                            | 1.62   |
+| NIPSNAP1  | Nipsnap Homolog 1                                            | Protein Coding | 49    | Parkinson's Disease, LRRK2                                | 2                         | 2565                            | 1.62   |
+| RAD51C    | RAD51 Paralog C                                              | Protein Coding | 51    | Parkinson's Disease, LRRK2                                | 2                         | 2573                            | 1.60   |
+| NCALD     | Neurocalcin Delta                                            | Protein Coding | 51    | Parkinson's Disease, LRRK2                                | 2                         | 2573                            | 1.60   |
+| LRRC1     | Leucine Rich Repeat Containing 1                             | Protein Coding | 44    | Parkinson's Disease, LRRK2                                | 2                         | 2573                            | 1.60   |
+| PKNOX1    | PBX/Knotted 1 Homeobox 1                                     | Protein Coding | 47    | Parkinson's Disease, LRRK2                                | 2                         | 2573                            | 1.60   |
+| GABARAPL1 | GABA Type A Receptor Associated Protein Like 1               | Protein Coding | 53    | Parkinson's Disease, neurodegeneration                    | 2                         | 2609                            | 1.51   |
+| MAP1LC3B  | Microtubule Associated Protein 1 Light Chain 3 Beta          | Protein Coding | 52    | Parkinson's Disease, neurodegeneration                    | 2                         | 2611                            | 1.50   |
+| LYVE1     | Lymphatic Vessel Endothelial Hyaluronan Receptor 1           | Protein Coding | 51    | late-onset, neurodegeneration                             | 2                         | 2651                            | 1.41   |
+| DYNC1I1   | Dynein Cytoplasmic 1 Intermediate Chain 1                    | Protein Coding | 48    | Parkinson's Disease, neurodegeneration                    | 2                         | 2666                            | 1.37   |
+| FOXO4     | Forkhead Box O4                                              | Protein Coding | 51    | Parkinson's Disease, LRRK2                                | 2                         | 2667                            | 1.37   |
+| NME3      | NME/NM23 Nucleoside Diphosphate Kinase 3                     | Protein Coding | 51    | Parkinson's Disease, neurodegeneration                    | 2                         | 2680                            | 1.33   |
+| SERTAD3   | SERTA Domain Containing 3                                    | Protein Coding | 38    | neurodegeneration                                         | 1                         | 2476                            | 1.29   |
+| USP8      | Ubiquitin Specific Peptidase 8                               | Protein Coding | 57    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2776                            | 1.27   |
+| ATG14     | Autophagy Related 14                                         | Protein Coding | 43    | Parkinson's Disease                                       | 1                         | 2551                            | 1.17   |
+| LDLRAD4   | Low Density Lipoprotein Receptor Class A Domain Containing 4 | Protein Coding | 40    | Parkinson's Disease                                       | 1                         | 2551                            | 1.17   |
+| TAF4      | TATA-Box Binding Protein Associated Factor 4                 | Protein Coding | 48    | LRRK2, neurodegeneration                                  | 2                         | 2778                            | 1.03   |
+| RBL1      | RB Transcriptional Corepressor Like 1                        | Protein Coding | 51    | LRRK2, late-onset                                         | 2                         | 2802                            | 0.95   |
+| IARS2     | Isoleucyl-TRNA Synthetase 2, Mitochondrial                   | Protein Coding | 49    | Parkinson's Disease                                       | 1                         | 2681                            | 0.94   |
+| KLHL36    | Kelch Like Family Member 36                                  | Protein Coding | 41    | late-onset                                                | 1                         | 2683                            | 0.93   |
+| ST3GAL5   | ST3 Beta-Galactoside Alpha-2,3-Sialyltransferase 5           | Protein Coding | 55    | late-onset                                                | 1                         | 2706                            | 0.88   |
+| CLIC2     | Chloride Intracellular Channel 2                             | Protein Coding | 49    | late-onset                                                | 1                         | 2706                            | 0.88   |
+| DDX42     | DEAD-Box Helicase 42                                         | Protein Coding | 46    | Parkinson's Disease                                       | 1                         | 2711                            | 0.87   |
+| ANXA6     | Annexin A6                                                   | Protein Coding | 53    | Parkinson's Disease                                       | 1                         | 2711                            | 0.87   |
+| CCDC40    | Coiled-Coil Domain Containing 40                             | Protein Coding | 45    | Parkinson's Disease                                       | 1                         | 2711                            | 0.87   |
+| LAG3      | Lymphocyte Activating 3                                      | Protein Coding | 44    | Parkinson's Disease                                       | 1                         | 2711                            | 0.87   |
+| SDCCAG3   | Serologically Defined Colon Cancer Antigen 3                 | Protein Coding | 41    | Parkinson's Disease                                       | 1                         | 2711                            | 0.87   |
+| BCAR3     | BCAR3, NSP Family Adaptor Protein                            | Protein Coding | 49    | Parkinson's Disease                                       | 1                         | 2711                            | 0.87   |
+| IMP4      | IMP4, U3 Small Nucleolar Ribonucleoprotein                   | Protein Coding | 42    | Parkinson's Disease                                       | 1                         | 2711                            | 0.87   |
+| LETMD1    | LETM1 Domain Containing 1                                    | Protein Coding | 43    | Parkinson's Disease                                       | 1                         | 2711                            | 0.87   |
+| PTP4A1    | Protein Tyrosine Phosphatase Type IVA, Member 1              | Protein Coding | 51    | Parkinson's Disease                                       | 1                         | 2711                            | 0.87   |
+| RCC1      | Regulator Of Chromosome Condensation 1                       | Protein Coding | 49    | LRRK2, neurodegeneration                                  | 2                         | 2829                            | 0.86   |
+| TXNL1     | Thioredoxin Like 1                                           | Protein Coding | 47    | late-onset                                                | 1                         | 2741                            | 0.79   |
+| CD84      | CD84 Molecule                                                | Protein Coding | 51    | late-onset                                                | 1                         | 2806                            | 0.66   |
+| DUSP9     | Dual Specificity Phosphatase 9                               | Protein Coding | 50    | LRRK2                                                     | 1                         | 2807                            | 0.66   |
+| FHIT      | Fragile Histidine Triad                                      | Protein Coding | 54    | Parkinson's Disease, late-onset                           | 2                         | 2896                            | 0.61   |
+| ANGPT2    | Angiopoietin 2                                               | Protein Coding | 55    | LRRK2, late-onset                                         | 2                         | 2901                            | 0.58   |
+| INHBB     | Inhibin Beta B Subunit                                       | Protein Coding | 53    | LRRK2, late-onset                                         | 2                         | 2901                            | 0.58   |
+| CALML4    | Calmodulin Like 4                                            | Protein Coding | 41    | LRRK2                                                     | 1                         | 2853                            | 0.54   |
+| HDAC7     | Histone Deacetylase 7                                        | Protein Coding | 52    | LRRK2                                                     | 1                         | 2853                            | 0.54   |
+| ATP2B2    | ATPase Plasma Membrane Ca2+ Transporting 2                   | Protein Coding | 54    | LRRK2, neurodegeneration                                  | 2                         | 2915                            | 0.52   |
+| PPP2R1B   | Protein Phosphatase 2 Scaffold Subunit Abeta                 | Protein Coding | 57    | LRRK2                                                     | 1                         | 2905                            | 0.39   |
+| RGS4      | Regulator Of G Protein Signaling 4                           | Protein Coding | 52    | LRRK2                                                     | 1                         | 2905                            | 0.39   |
+| KPNA1     | Karyopherin Subunit Alpha 1                                  | Protein Coding | 51    | Parkinson's Disease, neurodegeneration                    | 2                         | 2942                            | 0.35   |
+| NRXN3     | Neurexin 3                                                   | Protein Coding | 51    | neurodegeneration                                         | 1                         | 2920                            | 0.34   |
+| SARS      | Seryl-TRNA Synthetase                                        | Protein Coding | 53    | neurodegeneration                                         | 1                         | 2920                            | 0.34   |
+| PGRMC1    | Progesterone Receptor Membrane Component 1                   | Protein Coding | 53    | neurodegeneration                                         | 1                         | 2920                            | 0.34   |
+| RDH16     | Retinol Dehydrogenase 16 (All-Trans)                         | Protein Coding | 44    | LRRK2                                                     | 1                         | 2936                            | 0.28   |
+| SMAD6     | SMAD Family Member 6                                         | Protein Coding | 54    | LRRK2                                                     | 1                         | 2936                            | 0.28   |
+| NFATC4    | Nuclear Factor Of Activated T Cells 4                        | Protein Coding | 53    | LRRK2                                                     | 1                         | 2936                            | 0.28   |
+| REEP5     | Receptor Accessory Protein 5                                 | Protein Coding | 46    | LRRK2                                                     | 1                         | 2936                            | 0.28   |
+| EFNA4     | Ephrin A4                                                    | Protein Coding | 50    | LRRK2                                                     | 1                         | 2936                            | 0.28   |
+| MST1      | Macrophage Stimulating 1                                     | Protein Coding | 55    | LRRK2                                                     | 1                         | 2936                            | 0.28   |
+| FSTL3     | Follistatin Like 3                                           | Protein Coding | 48    | LRRK2                                                     | 1                         | 2936                            | 0.28   |
+| LAMA5     | Laminin Subunit Alpha 5                                      | Protein Coding | 51    | LRRK2                                                     | 1                         | 2936                            | 0.28   |
+| PRC1      | Protein Regulator Of Cytokinesis 1                           | Protein Coding | 47    | LRRK2                                                     | 1                         | 2936                            | 0.28   |
+| LAMB2     | Laminin Subunit Beta 2                                       | Protein Coding | 55    | LRRK2                                                     | 1                         | 2936                            | 0.28   |
+| ZNF629    | Zinc Finger Protein 629                                      | Protein Coding | 38    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| NR6A1     | Nuclear Receptor Subfamily 6 Group A Member 1                | Protein Coding | 50    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| ATP8A2    | ATPase Phospholipid Transporting 8A2                         | Protein Coding | 50    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| AREL1     | Apoptosis Resistant E3 Ubiquitin Protein Ligase 1            | Protein Coding | 38    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| ZNF692    | Zinc Finger Protein 692                                      | Protein Coding | 40    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| ROBO3     | Roundabout Guidance Receptor 3                               | Protein Coding | 52    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| ACAT2     | Acetyl-CoA Acetyltransferase 2                               | Protein Coding | 55    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| STX2      | Syntaxin 2                                                   | Protein Coding | 48    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| TCF3      | Transcription Factor 3                                       | Protein Coding | 55    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| RAB6B     | RAB6B, Member RAS Oncogene Family                            | Protein Coding | 46    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| DOCK6     | Dedicator Of Cytokinesis 6                                   | Protein Coding | 50    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| INSIG2    | Insulin Induced Gene 2                                       | Protein Coding | 47    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| DNAJB9    | DnaJ Heat Shock Protein Family (Hsp40) Member B9             | Protein Coding | 45    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| HLTF      | Helicase Like Transcription Factor                           | Protein Coding | 48    | LRRK2                                                     | 1                         | 2938                            | 0.27   |
+| VPS4B     | Vacuolar Protein Sorting 4 Homolog B                         | Protein Coding | 51    | Parkinson's Disease                                       | 1                         | 2952                            | 0.18   |
+| SLC23A2   | Solute Carrier Family 23 Member 2                            | Protein Coding | 52    | Parkinson's Disease                                       | 1                         | 2952                            | 0.18   |
+| TULP2     | Tubby Like Protein 2                                         | Protein Coding | 44    | late-onset                                                | 1                         | 2955                            | 0.13   |
+| ALAS1     | 5'-Aminolevulinate Synthase 1                                | Protein Coding | 53    | late-onset                                                | 1                         | 2955                            | 0.13   |
+| PTBP2     | Polypyrimidine Tract Binding Protein 2                       | Protein Coding | 47    | neurodegeneration                                         | 1                         | 2959                            | 0.07   |
+| ZMYND8    | Zinc Finger MYND-Type Containing 8                           | Protein Coding | 46    | neurodegeneration                                         | 1                         | 2959                            | 0.07   |
+| WDYHV1    | WDYHV Motif Containing 1                                     | Protein Coding | 39    | neurodegeneration                                         | 1                         | 2959                            | 0.07   |
+| FAM193B   | Family With Sequence Similarity 193 Member B                 | Protein Coding | 42    | neurodegeneration                                         | 1                         | 2959                            | 0.07   |
+| SEZ6L2    | Seizure Related 6 Homolog Like 2                             | Protein Coding | 46    | neurodegeneration                                         | 1                         | 2959                            | 0.07   |
+
+##Protein Interaction Network
+
+Using the 210 DEGs I seeded a network of 2429 nodes and 4097 edges.
+
+```{r, eval=F}
+library(biomaRt)
+
+setwd("/Users/clairegreen/Documents/PhD/TDP-43/TDP-43_Code/Results/PPI_Network/")
+
+PPI <- read.table("iref14_Human_UP_noDup_table_nodash.txt", header = T)
+braingenes <- read.csv("Zhang_BrainCelltype_Markers_braingenes.csv", header = T)
+
+DEG_list <- readLines("~/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/ALS_sfblood_ALLgenes.txt")
+
+mart <- useMart("ENSEMBL_MART_ENSEMBL",dataset="hsapiens_gene_ensembl", host="www.ensembl.org")
+attributes <- listAttributes(mart)
+mart_back <- getBM(attributes =c("hgnc_symbol", "uniprotswissprot"), filters="hgnc_symbol", values=DEG_list,  mart=mart)
+genelist_Uniprot <- subset(mart_back, !(mart_back$uniprotswissprot == ""))
+setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/")
+write.csv(genelist_Uniprot, "martback.csv", row.names = F)
+
+# IDENTIFY MISSING GENES AND FIND UNIPROT CODES FOR THEM. NB SOME GENES MAY NOT BE PROTEIN CODING #
+
+mart_table <- read.csv("martback.csv", header = T) #A table with the uniprot codes for the DEGs
+uniprot_gene <- mart_table$uniprotswissprot
+
+DEG_PPI <- subset(PPI, PPI$V1 %in% uniprot_gene | PPI$V2 %in% uniprot_gene)
+rownames(DEG_PPI) <- 1:nrow(DEG_PPI)
+
+write.csv(DEG_PPI, "DEG_PPI_famBlood.csv", row.names = F)
+
+## Convert Uniprot ID to HGNC symbol. Biomart jumbles output so
+## Go To https://biodbnet-abcc.ncifcrf.gov/db/db2db.php submit each column of names. Select Uniprot Accession for input and Gene Symbol for output.
+# Select "NO" for remove duplicate input valies
+
+DEG_PPI <- read.csv("DEG_PPI_famBlood.csv")
+
+DEG_PPI <- subset(DEG_PPI, DEG_PPI$Gene1 !="-")
+DEG_PPI <- subset(DEG_PPI, DEG_PPI$Gene2 !="-")
+
+write.csv(DEG_PPI, "FinalPDPPI.csv", row.names = F, quote = F)
+```
+   
+###PPI Network   
+```{r, out.width = "900px", out.height = "700px", echo=F}
+knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/FinalPDPPI.pdf")
+```
+
+## Common Coexpression
+
+I ran common coexpression again using Sharc. DUM was again removed because it had ~100,000 fewer edges than the other datasets. I then plotted the distributions of rho values to check they were normally distributed:
+```{r, out.width = "900px", out.height = "700px", echo=F}
+knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/RhoDiagram.pdf")
+```
+
+From this it is clear that the LEW and MOR.FC datasets do not have the power for a normal coexpression distribution. These two datasets were therefore removed from the common coexpression edge analysis. 
+
+When looking for a common edge, I tried three different minimum Rho values; 0.5, 0.4, and 0.3. 
+
+###Threshold of 0.5
+```{r, out.width = "900px", out.height = "700px", echo=F}
+knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point5.pdf")
+```
+
+###Threshold of 0.4
+```{r, out.width = "900px", out.height = "700px", echo=F}
+knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point4.pdf")
+```
+
+###Threshold of 0.3
+```{r, out.width = "900px", out.height = "700px", echo=F}
+knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point3.pdf")
+```
+
+
+### Largest Connected Component of 0.3
+```{r, out.width = "900px", out.height = "700px", echo=F}
+knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point3_nugget.pdf")
+```
+
+### IrefIndex 14.0 PPI between PD Malacards and LCC 
+```{r, out.width = "900px", out.height = "700px", echo=F}
+knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/0point3_PPI.pdf")
+```
+
+The largest connected component consists of 82 genes and 95 edges. 
+
+### Direct VarElect Results
+| Symbol    | Description                                                           | Category       | GIFTs | Matched Phenotypes                                        | Matched Phenotypes Scount | Global Rank (Total Genes 11967) | P-Value | Score  | Average Disease Causing Likelihood |
+|-----------|-----------------------------------------------------------------------|----------------|-------|-----------------------------------------------------------|---------------------------|---------------------------------|---------|--------|------------------------------------|
+| PARK7     | Parkinsonism Associated Deglycase                                     | Protein Coding | 56    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 5                               |         | 270.87 |                                    |
+| CYCS      | Cytochrome C, Somatic                                                 | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 63                              |         | 63.23  |                                    |
+| UBE2E3    | Ubiquitin Conjugating Enzyme E2 E3                                    | Protein Coding | 51    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 119                             |         | 48.51  |                                    |
+| STXBP1    | Syntaxin Binding Protein 1                                            | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 370                             |         | 18.76  |                                    |
+| VDR       | Vitamin D Receptor                                                    | Protein Coding | 61    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 380                             |         | 18.20  |                                    |
+| COX5A     | Cytochrome C Oxidase Subunit 5A                                       | Protein Coding | 53    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 536                             |         | 13.99  |                                    |
+| PGK1      | Phosphoglycerate Kinase 1                                             | Protein Coding | 59    | Parkinson's Disease, late-onset, neurodegeneration        | 3                         | 513                             |         | 12.40  |                                    |
+| NDUFA8    | NADH:Ubiquinone Oxidoreductase Subunit A8                             | Protein Coding | 50    | Parkinson's Disease, LRRK2, late-onset                    | 3                         | 641                             |         | 10.77  |                                    |
+| EIF4EBP1  | Eukaryotic Translation Initiation Factor 4E Binding Protein 1         | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset                    | 3                         | 715                             |         | 9.90   |                                    |
+| DLD       | Dihydrolipoamide Dehydrogenase                                        | Protein Coding | 61    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 899                             |         | 9.68   |                                    |
+| PSMC6     | Proteasome 26S Subunit, ATPase 6                                      | Protein Coding | 50    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 925                             |         | 9.51   |                                    |
+| PLA2G2A   | Phospholipase A2 Group IIA                                            | Protein Coding | 56    | Parkinson's Disease, late-onset, neurodegeneration        | 3                         | 770                             |         | 9.43   |                                    |
+| RTN4      | Reticulon 4                                                           | Protein Coding | 54    | LRRK2, late-onset, neurodegeneration                      | 3                         | 792                             |         | 9.21   |                                    |
+| NDUFA5    | NADH:Ubiquinone Oxidoreductase Subunit A5                             | Protein Coding | 51    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 998                             |         | 8.87   |                                    |
+| UQCRC2    | Ubiquinol-Cytochrome C Reductase Core Protein 2                       | Protein Coding | 55    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1033                            |         | 7.46   |                                    |
+| RAB11A    | RAB11A, Member RAS Oncogene Family                                    | Protein Coding | 55    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 1321                            |         | 6.93   |                                    |
+| SFXN1     | Sideroflexin 1                                                        | Protein Coding | 47    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1241                            |         | 6.34   |                                    |
+| RAB1A     | RAB1A, Member RAS Oncogene Family                                     | Protein Coding | 51    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1282                            |         | 6.14   |                                    |
+| PSMC5     | Proteasome 26S Subunit, ATPase 5                                      | Protein Coding | 51    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1311                            |         | 6.03   |                                    |
+| PSMA7     | Proteasome Subunit Alpha 7                                            | Protein Coding | 55    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1482                            |         | 5.27   |                                    |
+| SUMO1     | Small Ubiquitin-Like Modifier 1                                       | Protein Coding | 56    | Parkinson's Disease, neurodegeneration                    | 2                         | 1277                            |         | 5.04   |                                    |
+| ACLY      | ATP Citrate Lyase                                                     | Protein Coding | 53    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1577                            |         | 4.91   |                                    |
+| SDHA      | Succinate Dehydrogenase Complex Flavoprotein Subunit A                | Protein Coding | 56    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 1850                            |         | 4.77   |                                    |
+| PSMD6     | Proteasome 26S Subunit, Non-ATPase 6                                  | Protein Coding | 47    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1696                            |         | 4.56   |                                    |
+| UQCRC1    | Ubiquinol-Cytochrome C Reductase Core Protein 1                       | Protein Coding | 50    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1746                            |         | 4.43   |                                    |
+| PDHB      | Pyruvate Dehydrogenase E1 Beta Subunit                                | Protein Coding | 56    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1781                            |         | 4.32   |                                    |
+| NR4A1     | Nuclear Receptor Subfamily 4 Group A Member 1                         | Protein Coding | 55    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 1865                            |         | 4.09   |                                    |
+| IARS      | Isoleucyl-TRNA Synthetase                                             | Protein Coding | 55    | Parkinson's Disease, neurodegeneration                    | 2                         | 1597                            |         | 3.97   |                                    |
+| ATP6V1E1  | ATPase H+ Transporting V1 Subunit E1                                  | Protein Coding | 52    | Parkinson's Disease, LRRK2, late-onset                    | 3                         | 2008                            |         | 3.70   |                                    |
+| MAP2K1    | Mitogen-Activated Protein Kinase Kinase 1                             | Protein Coding | 65    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                         | 2197                            |         | 3.60   |                                    |
+| PPP2CA    | Protein Phosphatase 2 Catalytic Subunit Alpha                         | Protein Coding | 56    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2050                            |         | 3.58   |                                    |
+| TRIM37    | Tripartite Motif Containing 37                                        | Protein Coding | 51    | neurodegeneration                                         | 1                         | 1309                            |         | 3.49   |                                    |
+| UQCRFS1   | Ubiquinol-Cytochrome C Reductase, Rieske Iron-Sulfur Polypeptide 1    | Protein Coding | 51    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2137                            |         | 3.31   |                                    |
+| VAV1      | Vav Guanine Nucleotide Exchange Factor 1                              | Protein Coding | 57    | LRRK2, late-onset                                         | 2                         | 1938                            |         | 3.15   |                                    |
+| RUNX2     | Runt Related Transcription Factor 2                                   | Protein Coding | 57    | late-onset                                                | 1                         | 1481                            |         | 3.04   |                                    |
+| CUL3      | Cullin 3                                                              | Protein Coding | 55    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2349                            |         | 2.62   |                                    |
+| PPIA      | Peptidylprolyl Isomerase A                                            | Protein Coding | 57    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2366                            |         | 2.55   |                                    |
+| UBE2K     | Ubiquitin Conjugating Enzyme E2 K                                     | Protein Coding | 51    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2388                            |         | 2.49   |                                    |
+| COPS5     | COP9 Signalosome Subunit 5                                            | Protein Coding | 51    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2450                            |         | 2.31   |                                    |
+| PDHA1     | Pyruvate Dehydrogenase E1 Alpha 1 Subunit                             | Protein Coding | 59    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2547                            |         | 2.04   |                                    |
+| DDX1      | DEAD-Box Helicase 1                                                   | Protein Coding | 51    | Parkinson's Disease, neurodegeneration                    | 2                         | 2528                            |         | 1.71   |                                    |
+| ANXA7     | Annexin A7                                                            | Protein Coding | 51    | late-onset, neurodegeneration                             | 2                         | 2571                            |         | 1.60   |                                    |
+| YARS      | Tyrosyl-TRNA Synthetase                                               | Protein Coding | 53    | late-onset, neurodegeneration                             | 2                         | 2576                            |         | 1.60   |                                    |
+| PSMD12    | Proteasome 26S Subunit, Non-ATPase 12                                 | Protein Coding | 49    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                         | 2710                            |         | 1.50   |                                    |
+| EPS15     | Epidermal Growth Factor Receptor Pathway Substrate 15                 | Protein Coding | 54    | Parkinson's Disease, LRRK2                                | 2                         | 2701                            |         | 1.26   |                                    |
+| PIK3CB    | Phosphatidylinositol-4,5-Bisphosphate 3-Kinase Catalytic Subunit Beta | Protein Coding | 57    | LRRK2, neurodegeneration                                  | 2                         | 2746                            |         | 1.11   |                                    |
+| MDH1      | Malate Dehydrogenase 1                                                | Protein Coding | 55    | Parkinson's Disease, neurodegeneration                    | 2                         | 2770                            |         | 1.04   |                                    |
+| ATP6V1B2  | ATPase H+ Transporting V1 Subunit B2                                  | Protein Coding | 56    | LRRK2, neurodegeneration                                  | 2                         | 2775                            |         | 1.03   |                                    |
+| GABARAPL2 | GABA Type A Receptor Associated Protein Like 2                        | Protein Coding | 55    | Parkinson's Disease                                       | 1                         | 2652                            |         | 0.99   |                                    |
+| IARS2     | Isoleucyl-TRNA Synthetase 2, Mitochondrial                            | Protein Coding | 49    | Parkinson's Disease                                       | 1                         | 2681                            |         | 0.94   |                                    |
+| STRAP     | Serine/Threonine Kinase Receptor Associated Protein                   | Protein Coding | 45    | LRRK2, neurodegeneration                                  | 2                         | 2823                            |         | 0.88   |                                    |
+| FOSL1     | FOS Like 1, AP-1 Transcription Factor Subunit                         | Protein Coding | 52    | LRRK2, neurodegeneration                                  | 2                         | 2826                            |         | 0.87   |                                    |
+| ICK       | Intestinal Cell Kinase                                                | Protein Coding | 53    | Parkinson's Disease                                       | 1                         | 2711                            |         | 0.87   |                                    |
+| TXNL1     | Thioredoxin Like 1                                                    | Protein Coding | 47    | late-onset                                                | 1                         | 2741                            |         | 0.79   |                                    |
+| TMEM30A   | Transmembrane Protein 30A                                             | Protein Coding | 46    | Parkinson's Disease, LRRK2                                | 2                         | 2895                            |         | 0.62   |                                    |
+| RRAS      | RAS Related                                                           | Protein Coding | 52    | LRRK2                                                     | 1                         | 2853                            |         | 0.54   |                                    |
+| PRDM4     | PR/SET Domain 4                                                       | Protein Coding | 43    | LRRK2                                                     | 1                         | 2853                            |         | 0.54   |                                    |
+| NPTN      | Neuroplastin                                                          | Protein Coding | 49    | neurodegeneration                                         | 1                         | 2878                            |         | 0.49   |                                    |
+| ATP6V1H   | ATPase H+ Transporting V1 Subunit H                                   | Protein Coding | 48    | LRRK2                                                     | 1                         | 2905                            |         | 0.39   |                                    |
+| NME1      | NME/NM23 Nucleoside Diphosphate Kinase 1                              | Protein Coding | 57    | neurodegeneration                                         | 1                         | 2920                            |         | 0.34   |                                    |
+| REEP5     | Receptor Accessory Protein 5                                          | Protein Coding | 46    | LRRK2                                                     | 1                         | 2936                            |         | 0.28   |                                    |
+| SUCLA2    | Succinate-CoA Ligase ADP-Forming Beta Subunit                         | Protein Coding | 57    | LRRK2                                                     | 1                         | 2936                            |         | 0.28   |                                    |
+| BCAS2     | BCAS2, Pre-MRNA Processing Factor                                     | Protein Coding | 46    | LRRK2                                                     | 1                         | 2938                            |         | 0.27   |                                    |
+| SF3A2     | Splicing Factor 3a Subunit 2                                          | Protein Coding | 46    | LRRK2                                                     | 1                         | 2938                            |         | 0.27   |                                    |
+| HLTF      | Helicase Like Transcription Factor                                    | Protein Coding | 48    | LRRK2                                                     | 1                         | 2938                            |         | 0.27   |                                    |
+| RAB22A    | RAB22A, Member RAS Oncogene Family                                    | Protein Coding | 44    | LRRK2                                                     | 1                         | 2938                            |         | 0.27   |                                    |
+| RAN       | RAN, Member RAS Oncogene Family                                       | Protein Coding | 54    | neurodegeneration                                         | 1                         | 2958                            |         | 0.10   |                                    |
+| PTBP2     | Polypyrimidine Tract Binding Protein 2                                | Protein Coding | 47    | neurodegeneration                                         | 1                         | 2959                            |         | 0.07   |                                    |
+
+### Indirect VarElect Results
+| Implicated Symbol | Implicating Symbol | Description                                                                                    | Category       | GIFTs | Matched Phenotypes                                        | Matched Phenotypes Count | Global Rank (Total Genes 11967) | Score (Implicated) |
+|-------------------|--------------------|------------------------------------------------------------------------------------------------|----------------|-------|-----------------------------------------------------------|--------------------------|---------------------------------|--------------------|
+| UBE2V2            | PRKN               | Parkin RBR E3 Ubiquitin Protein Ligase                                                         | Protein Coding | 47    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 3                               | 23.14              |
+| UBE2V2            | RPS27A             | Ribosomal Protein S27a                                                                         | Protein Coding | 53    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 45                              | 23.14              |
+| UBE2V2            | FBXO7              | F-Box Protein 7                                                                                | Protein Coding | 50    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 16                              | 23.14              |
+| UBE2V2            | UCHL1              | Ubiquitin C-Terminal Hydrolase L1                                                              | Protein Coding | 62    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 7                               | 23.14              |
+| UBE2V2            | UBE2E2             | Ubiquitin Conjugating Enzyme E2 E2                                                             | Protein Coding | 49    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 145                             | 23.14              |
+| SNAP91            | SNCA               | Synuclein Alpha                                                                                | Protein Coding | 61    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 2                               | 13.14              |
+| SNAP91            | PRKN               | Parkin RBR E3 Ubiquitin Protein Ligase                                                         | Protein Coding | 47    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 3                               | 13.14              |
+| SNAP91            | SYNJ1              | Synaptojanin 1                                                                                 | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 33                              | 13.14              |
+| SNAP91            | DNAJC6             | DnaJ Heat Shock Protein Family (Hsp40) Member C6                                               | Protein Coding | 51    | Parkinson's Disease, LRRK2, late-onset                    | 3                        | 27                              | 13.14              |
+| SNAP91            | UCHL1              | Ubiquitin C-Terminal Hydrolase L1                                                              | Protein Coding | 62    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 7                               | 13.14              |
+| TERF2IP           | UCHL1              | Ubiquitin C-Terminal Hydrolase L1                                                              | Protein Coding | 62    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 7                               | 12.55              |
+| TERF2IP           | SNCA               | Synuclein Alpha                                                                                | Protein Coding | 61    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 2                               | 12.55              |
+| TERF2IP           | AKT1               | AKT Serine/Threonine Kinase 1                                                                  | Protein Coding | 65    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 79                              | 12.55              |
+| TERF2IP           | RPS27A             | Ribosomal Protein S27a                                                                         | Protein Coding | 53    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 45                              | 12.55              |
+| TERF2IP           | TBP                | TATA-Box Binding Protein                                                                       | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 40                              | 12.55              |
+| PYCARD            | BAX                | BCL2 Associated X, Apoptosis Regulator                                                         | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 107                             | 9.78               |
+| PYCARD            | NLRP3              | NLR Family Pyrin Domain Containing 3                                                           | Protein Coding | 56    | Parkinson's Disease, late-onset                           | 2                        | 222                             | 9.78               |
+| PYCARD            | PRKN               | Parkin RBR E3 Ubiquitin Protein Ligase                                                         | Protein Coding | 47    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 3                               | 9.78               |
+| PYCARD            | CASP3              | Caspase 3                                                                                      | Protein Coding | 61    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 56                              | 9.78               |
+| PYCARD            | SQSTM1             | Sequestosome 1                                                                                 | Protein Coding | 59    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 48                              | 9.78               |
+| SRPRB             | SNCA               | Synuclein Alpha                                                                                | Protein Coding | 61    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 2                               | 8.42               |
+| SRPRB             | PRKN               | Parkin RBR E3 Ubiquitin Protein Ligase                                                         | Protein Coding | 47    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 3                               | 8.42               |
+| SRPRB             | RPS27A             | Ribosomal Protein S27a                                                                         | Protein Coding | 53    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 45                              | 8.42               |
+| SRPRB             | UCHL1              | Ubiquitin C-Terminal Hydrolase L1                                                              | Protein Coding | 62    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 7                               | 8.42               |
+| SRPRB             | SNCAIP             | Synuclein Alpha Interacting Protein                                                            | Protein Coding | 52    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 8                               | 8.42               |
+| EIF1B             | EIF4G1             | Eukaryotic Translation Initiation Factor 4 Gamma 1                                             | Protein Coding | 55    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 36                              | 7.94               |
+| EIF1B             | UCHL1              | Ubiquitin C-Terminal Hydrolase L1                                                              | Protein Coding | 62    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 7                               | 7.94               |
+| EIF1B             | RPS27A             | Ribosomal Protein S27a                                                                         | Protein Coding | 53    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 45                              | 7.94               |
+| EIF1B             | SOD2               | Superoxide Dismutase 2                                                                         | Protein Coding | 60    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 78                              | 7.94               |
+| EIF1B             | GAPDH              | Glyceraldehyde-3-Phosphate Dehydrogenase                                                       | Protein Coding | 58    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 98                              | 7.94               |
+| MRPL15            | PARK7              | Parkinsonism Associated Deglycase                                                              | Protein Coding | 56    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 5                               | 7.78               |
+| MRPL15            | RPS27A             | Ribosomal Protein S27a                                                                         | Protein Coding | 53    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 45                              | 7.78               |
+| MRPL15            | NDUFS4             | NADH:Ubiquinone Oxidoreductase Subunit S4                                                      | Protein Coding | 52    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 31                              | 7.78               |
+| MRPL15            | TH                 | Tyrosine Hydroxylase                                                                           | Protein Coding | 62    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 24                              | 7.78               |
+| MRPL15            | EIF4G1             | Eukaryotic Translation Initiation Factor 4 Gamma 1                                             | Protein Coding | 55    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 36                              | 7.78               |
+| LYL1              | GDNF               | Glial Cell Derived Neurotrophic Factor                                                         | Protein Coding | 59    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 52                              | 7.74               |
+| LYL1              | PLAU               | Plasminogen Activator, Urokinase                                                               | Protein Coding | 63    | LRRK2, late-onset                                         | 2                        | 162                             | 7.74               |
+| LYL1              | NFKB1              | Nuclear Factor Kappa B Subunit 1                                                               | Protein Coding | 63    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 409                             | 7.74               |
+| LYL1              | ZEB1               | Zinc Finger E-Box Binding Homeobox 1                                                           | Protein Coding | 57    | late-onset                                                | 1                        | 273                             | 7.74               |
+| LYL1              | BAX                | BCL2 Associated X, Apoptosis Regulator                                                         | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 107                             | 7.74               |
+| XRCC2             | RPS27A             | Ribosomal Protein S27a                                                                         | Protein Coding | 53    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 45                              | 6.43               |
+| XRCC2             | NBN                | Nibrin                                                                                         | Protein Coding | 55    | Parkinson's Disease, late-onset, neurodegeneration        | 3                        | 388                             | 6.43               |
+| XRCC2             | TP53               | Tumor Protein P53                                                                              | Protein Coding | 65    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 201                             | 6.43               |
+| XRCC2             | COMT               | Catechol-O-Methyltransferase                                                                   | Protein Coding | 61    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 34                              | 6.43               |
+| XRCC2             | ATM                | ATM Serine/Threonine Kinase                                                                    | Protein Coding | 64    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 498                             | 6.43               |
+| BMP8B             | PLA2G6             | Phospholipase A2 Group VI                                                                      | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 12                              | 6.27               |
+| BMP8B             | BDNF               | Brain Derived Neurotrophic Factor                                                              | Protein Coding | 59    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 42                              | 6.27               |
+| BMP8B             | MAPK14             | Mitogen-Activated Protein Kinase 14                                                            | Protein Coding | 62    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 89                              | 6.27               |
+| BMP8B             | IL10               | Interleukin 10                                                                                 | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 243                             | 6.27               |
+| BMP8B             | GDNF               | Glial Cell Derived Neurotrophic Factor                                                         | Protein Coding | 59    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 52                              | 6.27               |
+| LAPTM4B           | GBA                | Glucosylceramidase Beta                                                                        | Protein Coding | 59    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 11                              | 5.59               |
+| LAPTM4B           | ABCB1              | ATP Binding Cassette Subfamily B Member 1                                                      | Protein Coding | 61    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 449                             | 5.59               |
+| LAPTM4B           | NEDD4              | Neural Precursor Cell Expressed, Developmentally Down-Regulated 4, E3 Ubiquitin Protein Ligase | Protein Coding | 55    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 669                             | 5.59               |
+| LAPTM4B           | SLC11A2            | Solute Carrier Family 11 Member 2                                                              | Protein Coding | 58    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 132                             | 5.59               |
+| LAPTM4B           | NFE2L2             | Nuclear Factor, Erythroid 2 Like 2                                                             | Protein Coding | 56    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 351                             | 5.59               |
+| ADSS              | GBA                | Glucosylceramidase Beta                                                                        | Protein Coding | 59    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 11                              | 4.39               |
+| ADSS              | PLA2G6             | Phospholipase A2 Group VI                                                                      | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 12                              | 4.39               |
+| ADSS              | GAD1               | Glutamate Decarboxylase 1                                                                      | Protein Coding | 61    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 120                             | 4.39               |
+| ADSS              | APOE               | Apolipoprotein E                                                                               | Protein Coding | 61    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 13                              | 4.39               |
+| ADSS              | MAPK14             | Mitogen-Activated Protein Kinase 14                                                            | Protein Coding | 62    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 89                              | 4.39               |
+| BTBD3             | CUL1               | Cullin 1                                                                                       | Protein Coding | 55    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 143                             | 1.47               |
+| BTBD3             | SKP1               | S-Phase Kinase Associated Protein 1                                                            | Protein Coding | 52    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                        | 310                             | 1.47               |
+| BTBD3             | E2F1               | E2F Transcription Factor 1                                                                     | Protein Coding | 53    | Parkinson's Disease, LRRK2, neurodegeneration             | 3                        | 1777                            | 1.47               |
+| BTBD3             | DAPK1              | Death Associated Protein Kinase 1                                                              | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 823                             | 1.47               |
+| BTBD3             | PLCB1              | Phospholipase C Beta 1                                                                         | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 1019                            | 1.47               |
+| RTCA              | LMNB1              | Lamin B1                                                                                       | Protein Coding | 57    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 228                             | 1.23               |
+| RTCA              | NOP56              | NOP56 Ribonucleoprotein                                                                        | Protein Coding | 51    | Parkinson's Disease, late-onset, neurodegeneration        | 3                        | 373                             | 1.23               |
+| RTCA              | IL6                | Interleukin 6                                                                                  | Protein Coding | 59    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 197                             | 1.23               |
+| RTCA              | HNRNPA1            | Heterogeneous Nuclear Ribonucleoprotein A1                                                     | Protein Coding | 56    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 538                             | 1.23               |
+| RTCA              | TNF                | Tumor Necrosis Factor                                                                          | Protein Coding | 63    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 185                             | 1.23               |

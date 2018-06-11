@@ -72,7 +72,8 @@ upBOT2gene <- upBOT2$Gene.Symbol
 
 
 INTUP <- Reduce(intersect, list(upLEWgene, upMID3gene, upMID4gene, upMOR.FCgene,
-                                upDIJgene, upFFRgene, upMID1gene, upMID2gene, upMOR.SNgene, upDUMgene, upBOTgene, upBOT2gene))
+                                upDIJgene, upFFRgene, upMID1gene, upMID2gene, 
+                                upMOR.SNgene, upDUMgene, upBOTgene, upBOT2gene))
 
 
 
@@ -399,11 +400,11 @@ intersect(resultsdown, PDgenes)
 
 
 
-setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/ALSPARK2LRRK2/")
-write.table(resultsup, "removeallUPgenes.txt", quote = F, row.names = F, col.names = F)
-write.table(resultsdown, "removeallDOWNgenes.txt", quote = F, row.names = F, col.names = F)
-write.table(results, "removeallALLgenes.txt", quote = F, row.names = F, col.names = F)
-cat(resultsup, sep="\n")
+# setwd("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/ALSPARK2LRRK2/")
+# write.table(resultsup, "removeallUPgenes.txt", quote = F, row.names = F, col.names = F)
+# write.table(resultsdown, "removeallDOWNgenes.txt", quote = F, row.names = F, col.names = F)
+# write.table(results, "removeallALLgenes.txt", quote = F, row.names = F, col.names = F)
+# cat(resultsup, sep="\n")
 
 intersect(resultsup, PDgenes)
 intersect(resultsdown, PDgenes)
