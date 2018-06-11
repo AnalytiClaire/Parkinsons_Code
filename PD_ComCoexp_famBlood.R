@@ -4,13 +4,13 @@
 
 #### Familial Blood ####
 #Read in network nodes
-DEG_PPI <- readLines("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PPIGenes.txt")
+DEG_PPI <- readLines("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_PPIgenes.txt")
 
 setwd("/users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/GeneExpression/")
 #Extract PPI network genes from each dataset#####
 LEW <- read.csv("LEWfilteredresult.csv")
 rownames(LEW) <- LEW$Gene.Symbol
-LEW <- LEW[,28:41]
+LEW <- LEW[,24:29]
 LEW <- subset(LEW, rownames(LEW) %in% DEG_PPI)
 
 MID3 <- read.csv("MID3filteredresult.csv")
@@ -119,6 +119,7 @@ LEW <- read.csv("LEWcorresult.csv")
 LEW$Gene1 <- as.character(lapply(strsplit(as.character(LEW$X), "\\:"), "[", 2))
 LEW$Gene2 <- as.character(lapply(strsplit(as.character(LEW$X), "\\:"), "[", 1))
 LEW <- LEW[,c(5,6,1,2,3,4)]
+LEW$X <- paste(LEW$Gene1,":",LEW$Gene2, sep = "")
 
 MID1 <- read.csv("MID1corresult.csv")
 MID1$Gene1 <- as.character(lapply(strsplit(as.character(MID1$X), "\\:"), "[", 2))
@@ -135,6 +136,8 @@ MID3 <- read.csv("MID3corresult.csv")
 MID3$Gene1 <- as.character(lapply(strsplit(as.character(MID3$X), "\\:"), "[", 2))
 MID3$Gene2 <- as.character(lapply(strsplit(as.character(MID3$X), "\\:"), "[", 1))
 MID3 <- MID3[,c(5,6,1,2,3,4)]
+MID3$X <- paste(MID3$Gene1,":",MID3$Gene2, sep = "")
+
 
 MID4 <- read.csv("MID4corresult.csv")
 MID4$Gene1 <- as.character(lapply(strsplit(as.character(MID4$X), "\\:"), "[", 2))
@@ -151,13 +154,14 @@ MOR.SN<- read.csv("MOR.SNcorresult.csv")
 MOR.SN$Gene1 <- as.character(lapply(strsplit(as.character(MOR.SN$X), "\\:"), "[", 2))
 MOR.SN$Gene2 <- as.character(lapply(strsplit(as.character(MOR.SN$X), "\\:"), "[", 1))
 MOR.SN <- MOR.SN[,c(5,6,1,2,3,4)]
+MOR.SN$X <- paste(MOR.SN$Gene1,":",MOR.SN$Gene2, sep = "")
 
-thresh <- 0.1
+thresh <- 0.3
 ### Filter by r value
 DIJ_cor.5 <- DIJ[DIJ$reg.mat > thresh | DIJ$reg.mat < -thresh,]
 # DUM_cor.5 <- DUM[DUM$reg.mat > thresh | DUM$reg.mat < -thresh,]
 FFR_cor.5 <- FFR[FFR$reg.mat > thresh | FFR$reg.mat < -thresh,]
-LEW_cor.5 <- LEW[LEW$reg.mat > thresh | LEW$reg.mat < -thresh,]
+# LEW_cor.5 <- LEW[LEW$reg.mat > thresh | LEW$reg.mat < -thresh,]
 MID1_cor.5 <- MID1[MID1$reg.mat > thresh | MID1$reg.mat < -thresh,]
 MID2_cor.5 <- MID2[MID2$reg.mat > thresh | MID2$reg.mat < -thresh,]
 MID3_cor.5 <- MID3[MID3$reg.mat > thresh | MID3$reg.mat < -thresh,]
@@ -168,9 +172,8 @@ MOR.SN_cor.5 <- MOR.SN[MOR.SN$reg.mat > thresh | MOR.SN$reg.mat < -thresh,]
 
 ### Find matches 
 
-Commonedge <- Reduce(intersect, list(DIJ_cor.5$X,FFR_cor.5$X,
-                                     LEW_cor.5$X, MID1_cor.5$X, MID2_cor.5$X,
-                                     MID3_cor.5$X, MID4_cor.5$X,
+Commonedge <- Reduce(intersect, list(DIJ_cor.5$X,FFR_cor.5$X, MID1_cor.5$X, 
+                                     MID2_cor.5$X,MID3_cor.5$X, MID4_cor.5$X,
                                      MOR.SN_cor.5$X))
 
 
@@ -181,8 +184,8 @@ DIJ_CE <- DIJ_CE[order(DIJ_CE$X),]
 # DUM_CE <- DUM_CE[order(DUM_CE$X),]
 FFR_CE <- subset(FFR_cor.5, FFR_cor.5$X %in% Commonedge)
 FFR_CE <- FFR_CE[order(FFR_CE$X),]
-LEW_CE <- subset(LEW_cor.5, LEW_cor.5$X %in% Commonedge)
-LEW_CE <- LEW_CE[order(LEW_CE$X),]
+# LEW_CE <- subset(LEW_cor.5, LEW_cor.5$X %in% Commonedge)
+# LEW_CE <- LEW_CE[order(LEW_CE$X),]
 MID1_CE <- subset(MID1_cor.5, MID1_cor.5$X %in% Commonedge)
 MID1_CE <- MID1_CE[order(MID1_CE$X),]
 MID2_CE <- subset(MID2_cor.5, MID2_cor.5$X %in% Commonedge)
@@ -201,7 +204,6 @@ MOR.SN_CE <- MOR.SN_CE[order(MOR.SN_CE$X),]
 CommonGroup <- data.frame(row.names = DIJ_CE$X,
                           DIJ = DIJ_CE$reg.mat,
                           FFR = FFR_CE$reg.mat,
-                          LEW = LEW_CE$reg.mat,
                           MID1 = MID1_CE$reg.mat,
                           MID2 = MID2_CE$reg.mat, 
                           MID3 = MID3_CE$reg.mat, 
@@ -219,7 +221,7 @@ CG_samedir$Gene <- rownames(CG_samedir)
 CG_samedir$Gene1 <- as.character(lapply(strsplit(as.character(CG_samedir$Gene), "\\:"), "[", 2))
 CG_samedir$Gene2 <- as.character(lapply(strsplit(as.character(CG_samedir$Gene), "\\:"), "[", 1))
 
-write.csv(CG_samedir, "PD_samedir_1.csv", quote = F, row.names = F)
+write.csv(CG_samedir, "PD_0point3.csv", quote = F, row.names = F)
 
 nodetable <- read.csv("PD_samedir_1node.csv")
 nuggenes <- as.character(nodetable$name)
