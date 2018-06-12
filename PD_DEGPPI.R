@@ -141,16 +141,16 @@ DEG_PPI <- subset(DEG_PPI, DEG_PPI$Gene2 !="-")
 
 write.csv(DEG_PPI, "FinalPDPPI.csv", row.names = F, quote = F)
 
-# # AFTER DOWNLOADING NODE TABLE FROM CYTOSCAPE #
-# 
-# nodetable <- read.csv("PD_DEG_PPInode.csv")
-# PDgenes <- readLines("/Users/clairegreen/Documents/PhD/Parkinsons/ParkinsonsDiseaseMalacards.txt")
-# celltype <- read.csv("~/Documents/PhD/TDP-43/TDP-43_Code/Results/PPI_Network/Zhang_BrainCelltype_Markers_braingenes.csv")
-# DEG <- DEG_list
-# 
-# nodetable$PDMalacards <- nodetable$shared.name %in% PDgenes
-# nodetable$DEG <- nodetable$name %in% DEG_list
-# nodetable_celltype <- merge(celltype, nodetable, by.x = "Gene.symbol",  by.y = "shared.name", all = T)
-# nodetable_celltype <- subset(nodetable_celltype, !(nodetable_celltype$SUID == "NA"))
-# 
-# write.csv(nodetable_celltype, "ModifiedPDNodetable.csv", row.names = F)
+# AFTER DOWNLOADING NODE TABLE FROM CYTOSCAPE #
+
+nodetable <- read.csv("FinalPDPPInode.csv")
+PDgenes <- readLines("/Users/clairegreen/Documents/PhD/Parkinsons/ParkinsonsDiseaseMalacards.txt")
+celltype <- read.csv("~/Documents/PhD/TDP-43/TDP-43_Code/Results/PPI_Network/Zhang_BrainCelltype_Markers_braingenes.csv")
+DEG <- readLines("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/ALS_sfblood_ALLgenes.txt")
+
+nodetable$PDMalacards <- nodetable$shared.name %in% PDgenes
+nodetable$DEG <- nodetable$name %in% DEG
+nodetable_celltype <- merge(celltype, nodetable, by.x = "Gene.symbol",  by.y = "shared.name", all = T)
+nodetable_celltype <- subset(nodetable_celltype, !(nodetable_celltype$SUID == "NA"))
+
+write.csv(nodetable_celltype, "ModifiedPDNodetable.csv", row.names = F)

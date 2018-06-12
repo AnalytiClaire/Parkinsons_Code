@@ -14,7 +14,8 @@ FFR <- read.csv("FFRExpressionOnly.csv", row.names = 1)
 MID1 <- read.csv("MID1ExpressionOnly.csv", row.names = 1)
 MID2 <- read.csv("MID2ExpressionOnly.csv", row.names = 1)
 MOR.SN <- read.csv("MOR.SNExpressionOnly.csv", row.names = 1)
-
+BOT1 <- read.csv("BOT1ExpressionOnly.csv", row.names = 1)
+BOT2 <- read.csv("BOT2ExpressionOnly.csv", row.names = 1)
 
 
 ##### LEW #####
@@ -25,13 +26,13 @@ names <- colnames(LEW)
 dev.off() #removes previous plot
 pca_2D <- prcomp(t(data))
 PC <- c(1,2)
-plot(pca_2D$x[,PC], pch=18, cex=1.25 , col=c(rep("green",8), rep("red",14)),main = "2D PCA Plot: PC1 vs PC2") #plot disease
+plot(pca_2D$x[,PC], pch=18, cex=1.25 , col=c(rep("green",4), rep("red",6)),main = "2D PCA Plot: PC1 vs PC2") #plot disease
 legend(16000, 14000,pch=18, legend=c("Disease", "Control"), col=c("red","green"), cex=1) #add legend
 text(pca_2D$x[,PC], labels = names,adj = 1.1, cex = 0.5) #label data points
 
 #3d PCA
 pca <- prcomp(t(data)) #conduct PCA
-pca3d(pca$x[,1:3], col=c(rep("green",8), rep("red",14))) #plot 3D
+pca3d(pca$x[,1:3], col=c(rep("green",4), rep("red",6))) #plot 3D
 text3d(pca$x[,1:3], text=names, adj=1.3, color="black", cex = 0.7) #add labels
 
 
@@ -39,12 +40,13 @@ text3d(pca$x[,1:3], text=names, adj=1.3, color="black", cex = 0.7) #add labels
 dev.off()
 logdata <- log2(data)
 boxplot(logdata,
-        col = c(rep("green",8),
-                c(rep("red", 14))),
+        col = c(rep("green",4),
+                c(rep("red", 6))),
         names = names,
         ylab = "Log2 Expression", 
         las = 2, 
-        cex = 0.3, 
+        cex = 0.3,
+        cex.axis = 0.7,
         par(mar = c(10, 5, 1, 1)))
 
 
@@ -292,3 +294,65 @@ boxplot(logdata,
         cex = 0.3, 
         par(mar = c(10, 5, 1, 1)))
 
+
+##### BOT1 #####
+# PCA 2D #
+analysis.name <- "BOT1"
+data <- BOT1
+names <- colnames(BOT1)
+dev.off() #removes previous plot
+pca_2D <- prcomp(t(data))
+PC <- c(1,2)
+plot(pca_2D$x[,PC], pch=18, cex=1.25 , col=c(rep("green",4), rep("red",2)),main = "2D PCA Plot: PC1 vs PC2") #plot disease
+legend(-20000, 8000,pch=18, legend=c("Disease", "Control"), col=c("red","green"), cex=1) #add legend
+text(pca_2D$x[,PC], labels = names,adj = 1, cex = 0.8) #label data points
+
+#3d PCA
+pca <- prcomp(t(data)) #conduct PCA
+pca3d(pca$x[,1:3], col=c(rep("green",4), rep("red",2))) #plot 3D
+# text3d(pca$x[,1:3], text=names, adj=1.3, color="black", cex = 0.7) #add labels
+
+
+## Box plots ##
+dev.off()
+logdata <- log2(data)
+boxplot(logdata,
+        col = c(rep("green",4),
+                c(rep("red", 2))),
+        names = names,
+        ylab = "Log2 Expression", 
+        las = 2, 
+        cex = 0.3,
+        cex.axis = 1.5,
+        par(mar = c(10, 5, 1, 1)))
+
+##### BOT2 #####
+# PCA 2D #
+analysis.name <- "BOT2"
+data <- BOT2
+names <- colnames(BOT2)
+dev.off() #removes previous plot
+pca_2D <- prcomp(t(data))
+PC <- c(1,2)
+plot(pca_2D$x[,PC], pch=18, cex=1.25 , col=c(rep("green",5), rep("red",3)),main = "2D PCA Plot: PC1 vs PC2") #plot disease
+legend(-20000, 8000,pch=18, legend=c("Disease", "Control"), col=c("red","green"), cex=1) #add legend
+text(pca_2D$x[,PC], labels = names,adj = 1, cex = 0.8) #label data points
+
+#3d PCA
+pca <- prcomp(t(data)) #conduct PCA
+pca3d(pca$x[,1:3], col=c(rep("green",5), rep("red",3))) #plot 3D
+# text3d(pca$x[,1:3], text=names, adj=1.3, color="black", cex = 0.7) #add labels
+
+
+## Box plots ##
+dev.off()
+logdata <- log2(data)
+boxplot(logdata,
+        col = c(rep("green",5),
+                c(rep("red", 3))),
+        names = names,
+        ylab = "Log2 Expression", 
+        las = 2, 
+        cex = 0.3,
+        cex.axis = 1.5,
+        par(mar = c(10, 5, 1, 1)))

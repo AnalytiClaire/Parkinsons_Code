@@ -6,7 +6,7 @@ output: html_document
 ---
 <style type="text/css">
 .main-container {
-  max-width: 1800px;
+  max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -35,9 +35,8 @@ Datasets were searched for using the same filters as before - must be human tiss
 
 Checked data distribution using PCA and boxplots. Some of the datasets have quite mixed samples wereas others separate quite nicely into controls and patients. Boxplots didn't suggest any samples were outliers.
 
-```{r, out.width = "900px", out.height = "700px", echo=F}
-knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/QC/QC_plots.pdf")
-```
+![](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/QC/Boxplots.jpg)
+![](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/QC/2DPCA.jpg)
 
 #Differential Gene Expression
 
@@ -1587,9 +1586,7 @@ write.csv(DEG_PPI, "FinalPDPPI.csv", row.names = F, quote = F)
 ```
    
 ###PPI Network   
-```{r, out.width = "900px", out.height = "700px", echo=F}
-knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/FinalPDPPI.pdf")
-```
+![](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/FinalPDPPI.jpg)
 
 ## Common Coexpression
 
@@ -1603,32 +1600,33 @@ From this it is clear that the LEW and MOR.FC datasets do not have the power for
 When looking for a common edge, I tried three different minimum Rho values; 0.5, 0.4, and 0.3. 
 
 ###Threshold of 0.5
-```{r, out.width = "900px", out.height = "700px", echo=F}
-knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point5.pdf")
-```
+![](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point5.jpg)
+
 
 ###Threshold of 0.4
-```{r, out.width = "900px", out.height = "700px", echo=F}
-knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point4.pdf")
-```
+![](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point4.jpg)
+
 
 ###Threshold of 0.3
-```{r, out.width = "900px", out.height = "700px", echo=F}
-knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point3.pdf")
-```
+![](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point3.jpg)
 
-
-### Largest Connected Component of 0.3
-```{r, out.width = "900px", out.height = "700px", echo=F}
-knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point3_nugget.pdf")
-```
-
-### IrefIndex 14.0 PPI between PD Malacards and LCC 
-```{r, out.width = "900px", out.height = "700px", echo=F}
-knitr::include_graphics("/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/0point3_PPI.pdf")
-```
 
 The largest connected component consists of 82 genes and 95 edges. 
+
+### Largest Connected Component of 0.3
+![](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/PD_0point3_nugget.jpg)
+
+
+### IrefIndex 14.0 PPI between PD Malacards and LCC 
+![](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/0point3_PPI.jpg)
+
+Here we can see that there are 25 LCC proteins which forming 45 PPI relationships with 25 PD Malacard genes (1 overlap of PARK7)
+
+##VarElect
+
+Although already noted, the VarElect results clearly show the membership of PARK7 in the network. The interesting thing about PARK7 being here is that it is more commonly associated with early-onset or juvenile Parkinson's disease. Another interesting point is that, although PARK7 PD is early-onset, it's classified by UniProt as having "slow progression and initial good response to levodopa". 
+
+CYCS or Cytochrome C, Somatic, is a small heme protein that functions as a central component of the electron transport chain in mitochondria. It is closely related to Parkinson's disease in the literature due to its apparent malfuction in the disease. 
 
 ### Direct VarElect Results
 | Symbol    | Description                                                           | Category       | GIFTs | Matched Phenotypes                                        | Matched Phenotypes Scount | Global Rank (Total Genes 11967) | P-Value | Score  | Average Disease Causing Likelihood |
@@ -1775,3 +1773,18 @@ The largest connected component consists of 82 genes and 95 edges.
 | RTCA              | IL6                | Interleukin 6                                                                                  | Protein Coding | 59    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 197                             | 1.23               |
 | RTCA              | HNRNPA1            | Heterogeneous Nuclear Ribonucleoprotein A1                                                     | Protein Coding | 56    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 538                             | 1.23               |
 | RTCA              | TNF                | Tumor Necrosis Factor                                                                          | Protein Coding | 63    | Parkinson's Disease, LRRK2, late-onset, neurodegeneration | 4                        | 185                             | 1.23               |
+
+
+## EnrichR Enrichment
+
+![KEGG](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/KEGG.png)
+
+![Wikipathways](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/Wikipathways.png)
+
+![Reactome](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/Reactome.png)
+
+![GO Cellular Component](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/GOCP.png)
+
+![GO Biological Process](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/GOBP.png)
+
+![GO Molecular Function](/Users/clairegreen/Documents/PhD/Parkinsons/Parkinsons_Code/Results/FamilialBlood/GOMF.png)
