@@ -1,0 +1,8 @@
+#!/bin/bash
+#$ -cwd                                # Run job from current directory
+#$ -l rmem=2G                          # Request 8 gigabytes of memory
+#$ -l h_rt=72:00:00			#cancel job if it takes more than 72 hours
+#$ -j y
+module load apps/R               # Recommended to load a specific version of R
+
+R CMD BATCH pairwisecorr_MID4.R pairwisecorr_MID4.R.o$JOB_ID
